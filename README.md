@@ -1,17 +1,58 @@
-# flutter_mobil_motor_bekas
+# 🚗 Mobil & Motor Bekas
 
-A new Flutter project.
+Aplikasi mobile untuk menampilkan dan mencari informasi kendaraan
+motor dan mobil bekas menggunakan Flutter.
 
-## Getting Started
+## 📱 Tentang Aplikasi
 
-This project is a starting point for a Flutter application.
+Aplikasi ini merupakan project untuk mata kuliah
+Pemrograman Berbasis Platform (PBP).
 
-A few resources to get you started if this is your first Flutter project:
+Aplikasi dibuat sebagai media pembelajaran dalam pengembangan
+aplikasi mobile menggunakan Flutter dan Dart, sekaligus
+menerapkan konsep Pemrograman Berorientasi Objek (PBO).
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Aplikasi ini memiliki konsep marketplace sederhana yang
+menampilkan berbagai kendaraan bekas yang dapat dilihat oleh
+pengguna beserta informasi detail kendaraannya.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ✨ Fitur
+
+- 🔐 Login
+- 🏠 Halaman Home
+- 🚗 Daftar mobil dan motor
+- 📋 Detail kendaraan
+- 👤 Profile pengguna
+- 🖼️ Tampilan gambar kendaraan
+- 🔄 Navigasi antar halaman
+- 🚪 Logout
+
+## 🛠️ Teknologi yang Digunakan
+
+- **Flutter**
+- **Dart**
+- **Android Studio**
+- **Visual Studio Code**
+
+## 📂 Struktur Project
+
+```text
+lib/
+├── model/
+│   ├── kendaraan_model.dart
+│   ├── detail_page.dart
+│   ├── home_page.dart
+│   ├── login_page.dart
+│   └── profile_page.dart
+│
+└── main.dart
+
+assets/
+├── logo.png
+├── mobil1.png
+├── mobil2.png
+├── mobil3.png
+├── motor1.png
+├── motor2.png
+├── motor3.png
+└── profile.png
