@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "671414277781",
+    "project_id": "secondhand-app-637e1",
+    "storage_bucket": "secondhand-app-637e1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:671414277781:android:78e40ec4f930be80392d9c",
+        "android_client_info": {
+          "package_name": "com.example.flutter_mobil_motor_bekas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "671414277781-45dnujc9gsjk0185a584kc1f3gutag0d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARGVtOSAyGMNTWJvocxxDYPOLH5avcIfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671414277781-45dnujc9gsjk0185a584kc1f3gutag0d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "671414277781-toe1emi5305stof533ba73tc6u9itkh9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterMobilMotorBekas"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

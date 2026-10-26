@@ -1,175 +1,126 @@
 class Kendaraan {
-  String _merk;
-  String _model;
-  int _tahun;
-  double _harga;
-  String _warna;
-  int _kilometer;
-  String _gambar;
-  String _deskripsi;
+  final String nama;
+  final String kategori;
+  final int harga;
+  final String tahun;
+  final String transmisi;
+  final String kilometer;
+  final String bahanBakar;
+  final String gambar;
+  final String deskripsi;
+  final bool unggulan;
 
-  Kendaraan({
-    required String merk,
-    required String model,
-    required int tahun,
-    required double harga,
-    required String warna,
-    required int kilometer,
-    required String gambar,
-    required String deskripsi,
-  }) : _merk = merk,
-       _model = model,
-       _tahun = tahun,
-       _harga = harga,
-       _warna = warna,
-       _kilometer = kilometer,
-       _gambar = gambar,
-       _deskripsi = deskripsi;
+  const Kendaraan({
+    required this.nama,
+    required this.kategori,
+    required this.harga,
+    required this.tahun,
+    required this.transmisi,
+    required this.kilometer,
+    required this.bahanBakar,
+    required this.gambar,
+    required this.deskripsi,
+    this.unggulan = false,
+  });
 
-  // =========================
-  // GETTER
-  // =========================
+  String get hargaFormat {
+    final value = harga.toString();
+    final buffer = StringBuffer();
 
-  String get merk => _merk;
-  String get model => _model;
-  int get tahun => _tahun;
-  double get harga => _harga;
-  String get warna => _warna;
-  int get kilometer => _kilometer;
-  String get gambar => _gambar;
-  String get deskripsi => _deskripsi;
+    for (int i = 0; i < value.length; i++) {
+      buffer.write(value[i]);
 
-  // =========================
-  // SETTER
-  // =========================
+      final remaining = value.length - i - 1;
+      if (remaining > 0 && remaining % 3 == 0) {
+        buffer.write('.');
+      }
+    }
 
-  set merk(String value) {
-    _merk = value;
-  }
-
-  set model(String value) {
-    _model = value;
-  }
-
-  set tahun(int value) {
-    _tahun = value;
-  }
-
-  set harga(double value) {
-    _harga = value;
-  }
-
-  set warna(String value) {
-    _warna = value;
-  }
-
-  set kilometer(int value) {
-    _kilometer = value;
-  }
-
-  set gambar(String value) {
-    _gambar = value;
-  }
-
-  set deskripsi(String value) {
-    _deskripsi = value;
-  }
-
-  // =========================
-  // FUNCTION / METHOD
-  // =========================
-
-  String getNamaKendaraan() {
-    return '$merk $model';
-  }
-
-  String getHarga() {
-    return 'Rp ${harga.toStringAsFixed(0)}';
-  }
-
-  String getInfo() {
-    return '$merk $model • $tahun • $kilometer km';
-  }
-
-  void ubahHarga(double hargaBaru) {
-    _harga = hargaBaru;
+    return 'Rp ${buffer.toString()}';
   }
 }
 
-// =====================================================
-// INHERITANCE - MOBIL
-// =====================================================
-
-class Mobil extends Kendaraan {
-  int _jumlahPintu;
-  String _transmisi;
-
-  Mobil({
-    required super.merk,
-    required super.model,
-    required super.tahun,
-    required super.harga,
-    required super.warna,
-    required super.kilometer,
-    required super.gambar,
-    required super.deskripsi,
-    required int jumlahPintu,
-    required String transmisi,
-  }) : _jumlahPintu = jumlahPintu,
-       _transmisi = transmisi;
-
-  int get jumlahPintu => _jumlahPintu;
-
-  String get transmisi => _transmisi;
-
-  set jumlahPintu(int value) {
-    _jumlahPintu = value;
-  }
-
-  set transmisi(String value) {
-    _transmisi = value;
-  }
-
-  String getInfoMobil() {
-    return '$merk $model • $transmisi • $jumlahPintu pintu';
-  }
-}
-
-// =====================================================
-// INHERITANCE - MOTOR
-// =====================================================
-
-class Motor extends Kendaraan {
-  String _jenisMotor;
-  int _kapasitasMesin;
-
-  Motor({
-    required super.merk,
-    required super.model,
-    required super.tahun,
-    required super.harga,
-    required super.warna,
-    required super.kilometer,
-    required super.gambar,
-    required super.deskripsi,
-    required String jenisMotor,
-    required int kapasitasMesin,
-  }) : _jenisMotor = jenisMotor,
-       _kapasitasMesin = kapasitasMesin;
-
-  String get jenisMotor => _jenisMotor;
-
-  int get kapasitasMesin => _kapasitasMesin;
-
-  set jenisMotor(String value) {
-    _jenisMotor = value;
-  }
-
-  set kapasitasMesin(int value) {
-    _kapasitasMesin = value;
-  }
-
-  String getInfoMotor() {
-    return '$merk $model • $kapasitasMesin cc • $jenisMotor';
-  }
-}
+final List<Kendaraan> daftarKendaraan = [
+  const Kendaraan(
+    nama: 'Toyota Avanza',
+    kategori: 'Mobil',
+    harga: 165000000,
+    tahun: '2022',
+    transmisi: 'Manual',
+    kilometer: '35.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/mobil1.png',
+    deskripsi:
+        'Mobil keluarga dengan kabin luas dan nyaman untuk perjalanan harian. '
+        'Silakan hubungi showroom untuk informasi kondisi, kelengkapan, '
+        'dan jadwal pengecekan unit.',
+    unggulan: true,
+  ),
+  const Kendaraan(
+    nama: 'Honda Brio',
+    kategori: 'Mobil',
+    harga: 142000000,
+    tahun: '2021',
+    transmisi: 'Automatic',
+    kilometer: '28.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/mobil2.png',
+    deskripsi:
+        'Mobil kompak yang praktis untuk aktivitas sehari-hari. '
+        'Hubungi showroom untuk memastikan kondisi dan ketersediaan unit.',
+    unggulan: true,
+  ),
+  const Kendaraan(
+    nama: 'Mitsubishi Xpander',
+    kategori: 'Mobil',
+    harga: 198000000,
+    tahun: '2022',
+    transmisi: 'Automatic',
+    kilometer: '32.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/mobil3.png',
+    deskripsi:
+        'Pilihan mobil keluarga dengan ruang kabin yang lega. '
+        'Detail kendaraan dan riwayat perawatan dapat ditanyakan langsung.',
+  ),
+  const Kendaraan(
+    nama: 'Honda Vario',
+    kategori: 'Motor',
+    harga: 18500000,
+    tahun: '2023',
+    transmisi: 'Automatic',
+    kilometer: '8.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/motor1.png',
+    deskripsi:
+        'Motor untuk mobilitas harian. Hubungi showroom untuk informasi '
+        'kondisi unit, dokumen, dan jadwal melihat kendaraan.',
+    unggulan: true,
+  ),
+  const Kendaraan(
+    nama: 'Yamaha NMAX',
+    kategori: 'Motor',
+    harga: 24500000,
+    tahun: '2022',
+    transmisi: 'Automatic',
+    kilometer: '12.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/motor2.png',
+    deskripsi:
+        'Motor dengan posisi berkendara yang nyaman. '
+        'Silakan tanyakan ketersediaan dan detail unit kepada showroom.',
+  ),
+  const Kendaraan(
+    nama: 'Honda Beat',
+    kategori: 'Motor',
+    harga: 14500000,
+    tahun: '2022',
+    transmisi: 'Automatic',
+    kilometer: '10.000 km',
+    bahanBakar: 'Bensin',
+    gambar: 'assets/motor3.png',
+    deskripsi:
+        'Motor yang praktis untuk kebutuhan sehari-hari. '
+        'Pastikan kondisi dan kelengkapan kendaraan dengan pihak showroom.',
+  ),
+];

@@ -1,547 +1,397 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'detail_page.dart';
-import 'login_page.dart';
-import 'model/kendaraan_model.dart';
+import 'main.dart';
 
-class ProfilePage extends StatelessWidget {
-  final List<Kendaraan> favoriteVehicles;
-  final Function(Kendaraan) onFavoritePressed;
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
-  const ProfilePage({
-    super.key,
-    required this.favoriteVehicles,
-    required this.onFavoritePressed,
-  });
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
-  void logout(BuildContext context) {
-    showDialog(
+class _ProfilePageState extends State<ProfilePage> {
+  bool _isLoggingOut = false;
+
+  User? get _user => FirebaseAuth.instance.currentUser;
+
+  String get _displayName {
+    final name = _user?.displayName?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+
+    final email = _user?.email;
+    if (email != null && email.isNotEmpty) {
+      return email.split('@').first;
+    }
+
+    return 'Pengguna SecondHand';
+  }
+
+  String get _initial {
+    final name = _displayName.trim();
+    return name.isEmpty ? 'S' : name[0].toUpperCase();
+  }
+
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: const Text(
-            'Sign out?',
+            'Keluar dari akun?',
             style: TextStyle(fontWeight: FontWeight.w800),
           ),
-          content: const Text('Kamu akan keluar dari akun AutoMarket.'),
+          content: const Text(
+            'Kamu perlu login kembali untuk mengakses katalog SecondHand.',
+          ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Batal'),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF171717),
-                foregroundColor: Colors.white,
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Theme.of(context).colorScheme.onError,
               ),
-              child: const Text('Sign out'),
+              child: const Text('Logout'),
             ),
           ],
         );
       },
     );
-  }
 
-  void showPersonalInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Personal Information',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Nama', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              SizedBox(height: 4),
-              Text(
-                'Bahtiar Abdullah Karim',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 15),
-              Text(
-                'Program Studi',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Teknik Informatika',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+    if (confirmed != true || !mounted) return;
 
-  void showEducation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Education',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          content: const Text(
-            'Program Studi Teknik Informatika\n'
-            'Flutter Student Project',
-          ),
-        );
-      },
-    );
-  }
+    setState(() => _isLoggingOut = true);
 
-  void showStudentId(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Student ID',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-          content: const Text(
-            'NIM: 25051204396\n\n'
-            '25051204396.',
-          ),
-        );
-      },
-    );
-  }
-
-  void showMyVehicles(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'My Vehicles',
-                style: TextStyle(fontSize: 23, fontWeight: FontWeight.w800),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Kendaraan yang kamu jual.',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-
-              const SizedBox(height: 25),
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F2),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.directions_car_outlined,
-                      size: 45,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Belum ada kendaraan',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'Fitur menjual kendaraan akan '
-                      'dikembangkan pada tahap berikutnya.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void showFavorites(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height * .65,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Favorites',
-                      style: TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${favoriteVehicles.length}',
-                      style: TextStyle(color: Colors.grey.shade500),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 18),
-
-                if (favoriteVehicles.isEmpty)
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.favorite_border,
-                            size: 50,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Belum ada favorit',
-                            style: TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: favoriteVehicles.length,
-                      itemBuilder: (context, index) {
-                        final kendaraan = favoriteVehicles[index];
-
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5,
-                          ),
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              kendaraan.gambar,
-                              width: 65,
-                              height: 55,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text(
-                            kendaraan.getNamaKendaraan(),
-                            style: const TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                          subtitle: Text(kendaraan.getHarga()),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15,
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailPage(
-                                  kendaraan: kendaraan,
-                                  isFavorite: true,
-                                  onFavoritePressed: () {
-                                    onFavoritePressed(kendaraan);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget menuItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String subtitle,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: const Color(0xFFE8E8E5)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F2EF),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, size: 20),
-            ),
-
-            const SizedBox(width: 14),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
-        ),
-      ),
-    );
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal logout. Silakan coba lagi.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoggingOut = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final user = _user;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F5),
-
+      appBar: AppBar(
+        title: const Text(
+          'Profil Saya',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        actions: [
+          IconButton(
+            tooltip: AppTheme.isDark
+                ? 'Gunakan tema terang'
+                : 'Gunakan tema gelap',
+            onPressed: () {
+              AppTheme.toggle();
+              setState(() {});
+            },
+            icon: Icon(
+              AppTheme.isDark
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 25, 20, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Profile',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -.8,
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF171717),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/profile.png',
-                          fit: BoxFit.cover,
-                        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Kartu Header Profil
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [const Color(0xFF283120), const Color(0xFF1D2318)]
+                            : [
+                                const Color(0xFFEAF0DF),
+                                const Color(0xFFDCE7C8),
+                              ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: const Color(0xFF789449).withValues(alpha: 0.2),
                       ),
                     ),
-
-                    const SizedBox(width: 15),
-
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Bahtiar Abdullah Karim',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 44,
+                          backgroundColor: const Color(0xFFB6D477),
+                          backgroundImage:
+                              user?.photoURL != null &&
+                                  user!.photoURL!.isNotEmpty
+                              ? NetworkImage(user.photoURL!)
+                              : null,
+                          child:
+                              user?.photoURL == null || user!.photoURL!.isEmpty
+                              ? Text(
+                                  _initial,
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF1E231B),
+                                  ),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          _displayName,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          user?.email ?? 'Email tidak tersedia',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFB6D477),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            user?.isAnonymous == true
+                                ? 'Akun Tamu'
+                                : 'Member SecondHand',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF1E231B),
                               fontWeight: FontWeight.w800,
                             ),
                           ),
-                          SizedBox(height: 5),
-                          Text(
-                            'Teknik Informatika',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 12,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'AutoMarket member',
-                            style: TextStyle(
-                              color: Color(0xFFD8FF3E),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 26),
+
+                  Text(
+                    'Informasi Akun',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _ProfileTile(
+                    icon: Icons.person_outline_rounded,
+                    title: 'Nama Pengguna',
+                    subtitle: _displayName,
+                  ),
+                  const SizedBox(height: 10),
+                  _ProfileTile(
+                    icon: Icons.email_outlined,
+                    title: 'Alamat Email',
+                    subtitle: user?.email ?? 'Tidak tersedia',
+                  ),
+                  const SizedBox(height: 10),
+                  _ProfileTile(
+                    icon: Icons.verified_user_outlined,
+                    title: 'Status Verifikasi',
+                    subtitle: user?.emailVerified == true
+                        ? 'Email Terverifikasi'
+                        : 'Email Belum Terverifikasi',
+                  ),
+
+                  const SizedBox(height: 26),
+
+                  Text(
+                    'Preferensi Tampilan',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: colors.outlineVariant.withValues(alpha: 0.5),
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              const Text(
-                'Account',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-              ),
-
-              const SizedBox(height: 12),
-
-              menuItem(
-                context,
-                Icons.person_outline,
-                'Personal information',
-                'Bahtiar Abdullah Karim',
-                () => showPersonalInfo(context),
-              ),
-
-              menuItem(
-                context,
-                Icons.school_outlined,
-                'Education',
-                'Teknik Informatika',
-                () => showEducation(context),
-              ),
-
-              menuItem(
-                context,
-                Icons.badge_outlined,
-                'Student ID',
-                '25051204396',
-                () => showStudentId(context),
-              ),
-
-              const SizedBox(height: 15),
-
-              const Text(
-                'Application',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-              ),
-
-              const SizedBox(height: 12),
-
-              menuItem(
-                context,
-                Icons.directions_car_outlined,
-                'My vehicles',
-                'Vehicles that you listed',
-                () => showMyVehicles(context),
-              ),
-
-              menuItem(
-                context,
-                Icons.favorite_border,
-                'Favorites',
-                '${favoriteVehicles.length} saved vehicles',
-                () => showFavorites(context),
-              ),
-
-              const SizedBox(height: 15),
-
-              SizedBox(
-                width: double.infinity,
-                height: 53,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    logout(context);
-                  },
-                  icon: const Icon(Icons.logout, size: 19),
-                  label: const Text(
-                    'Sign out',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF171717),
-                    side: const BorderSide(color: Color(0xFFD9D9D5)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    child: SwitchListTile(
+                      value: AppTheme.isDark,
+                      onChanged: (_) {
+                        AppTheme.toggle();
+                        setState(() {});
+                      },
+                      secondary: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          AppTheme.isDark
+                              ? Icons.dark_mode_rounded
+                              : Icons.light_mode_rounded,
+                          color: colors.onPrimaryContainer,
+                        ),
+                      ),
+                      title: const Text(
+                        'Mode Gelap (Dark Mode)',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: const Text('Nyaman di mata saat malam hari'),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 25),
+                  const SizedBox(height: 28),
 
-              Center(
-                child: Text(
-                  'AUTOMARKET v1.0',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
+                  OutlinedButton.icon(
+                    onPressed: _isLoggingOut ? null : _logout,
+                    icon: _isLoggingOut
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.logout_rounded),
+                    label: Text(
+                      _isLoggingOut ? 'Sedang keluar...' : 'Keluar dari Akun',
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colors.error,
+                      side: BorderSide(
+                        color: colors.error.withValues(alpha: 0.5),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
-                ),
+
+                  const SizedBox(height: 24),
+
+                  Text(
+                    'SecondHand v1.0 • Showroom Kendaraan Bekas',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _ProfileTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: colors.primaryContainer,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: Icon(icon, color: colors.onPrimaryContainer),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
