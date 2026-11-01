@@ -21,15 +21,11 @@ class AboutUsPage extends StatelessWidget {
       'photo': 'assets/team/nama.jpg',
     },
     {
-      'name': 'Dimas Saputra',
-      'nim': '230000004',
-      'photo': 'assets/team/nama.jpg',
+      'name': 'Yesica Candra Carlota',
+      'nim': '25051204423',
+      'photo': 'assets/team/yesica.jpeg',
     },
-    {
-      'name': 'Eka Putri',
-      'nim': '230000005',
-      'photo': 'assets/team/nama.jpg',
-    },
+    {'name': 'Eka Putri', 'nim': '230000005', 'photo': 'assets/team/nama.jpg'},
     {
       'name': 'Fajar Ramadhan',
       'nim': '230000006',
@@ -50,17 +46,11 @@ class AboutUsPage extends StatelessWidget {
         foregroundColor: Colors.white,
         title: const Text(
           'About Us',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 35,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 35),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
@@ -155,8 +145,7 @@ class AboutUsPage extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: members.length,
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: columns,
                         crossAxisSpacing: 18,
                         mainAxisSpacing: 25,
@@ -168,7 +157,7 @@ class AboutUsPage extends StatelessWidget {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // AREA FOTO                 
+                            // AREA FOTO
                             Expanded(
                               child: Container(
                                 width: double.infinity,
@@ -178,22 +167,24 @@ class AboutUsPage extends StatelessWidget {
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
-                                  child: member['photo'] != null &&
+                                  child:
+                                      member['photo'] != null &&
                                           member['photo']!.isNotEmpty
                                       ? Image.asset(
                                           member['photo']!,
                                           width: double.infinity,
                                           height: double.infinity,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return const Center(
-                                              child: Icon(
-                                                Icons.person,
-                                                size: 85,
-                                                color: Color(0xFF789449),
-                                              ),
-                                            );
-                                          },
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return const Center(
+                                                  child: Icon(
+                                                    Icons.person,
+                                                    size: 85,
+                                                    color: Color(0xFF789449),
+                                                  ),
+                                                );
+                                              },
                                         )
                                       : const Center(
                                           child: Icon(
