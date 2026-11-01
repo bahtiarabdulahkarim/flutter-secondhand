@@ -4,6 +4,7 @@ import 'detail_page.dart';
 import 'main.dart';
 import 'model/kendaraan_model.dart';
 import 'profile_page.dart';
+import 'about_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,6 +71,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(7),
@@ -84,17 +86,24 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'SECONDHAND MOTORS',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'SECONDHAND MOTORS',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
             ),
           ],
         ),
         actions: [
+          // Tombol Dark Mode
           IconButton(
             tooltip: AppTheme.isDark ? 'Mode Terang' : 'Mode Gelap',
             onPressed: AppTheme.toggle,
@@ -102,6 +111,26 @@ class _HomePageState extends State<HomePage> {
               AppTheme.isDark
                   ? Icons.light_mode_outlined
                   : Icons.dark_mode_outlined,
+            ),
+          ),
+
+          // Tombol About
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AboutPage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.info_outline_rounded, size: 18),
+              label: const Text('About'),
+              style: TextButton.styleFrom(
+                foregroundColor: theme.colorScheme.onSurface,
+              ),
             ),
           ),
           Padding(
