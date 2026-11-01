@@ -11,9 +11,9 @@ class AboutUsPage extends StatelessWidget {
       'photo': 'assets/team/Andhika.jpeg',
     },
     {
-      'name': 'Budi Santoso',
-      'nim': '230000002',
-      'photo': 'assets/team/nama.jpg',
+      'name': 'Eka Fajar Deny Iswantoro',
+      'nim': '25051204391',
+      'photo': 'assets/team/deny.jpeg',
     },
     {
       'name': 'Citra Amelia',
