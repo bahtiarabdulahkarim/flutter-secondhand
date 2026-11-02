@@ -32,9 +32,9 @@ class AboutUsPage extends StatelessWidget {
       'photo': 'assets/team/nama.jpg',
     },
     {
-      'name': 'Gita Maharani',
-      'nim': '230000007',
-      'photo': 'assets/team/nama.jpg',
+      'name': 'Dhea Sarrah Azzahra',
+      'nim': '25051204432',
+      'photo': 'assets/team/dhea.jpeg',
     },
   ];
 
