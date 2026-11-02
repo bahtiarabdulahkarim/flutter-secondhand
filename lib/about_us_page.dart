@@ -16,9 +16,9 @@ class AboutUsPage extends StatelessWidget {
       'photo': 'assets/team/deny.jpeg',
     },
     {
-      'name': 'Citra Amelia',
-      'nim': '230000003',
-      'photo': 'assets/team/nama.jpg',
+      'name': 'Bahtiar Abdulah Karim',
+      'nim': '25051204396',
+      'photo': 'assets/team/bahtiar.jpeg',
     },
     {
       'name': 'Yesica Candra Carlota',
