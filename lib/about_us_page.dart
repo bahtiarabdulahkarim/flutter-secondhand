@@ -25,7 +25,10 @@ class AboutUsPage extends StatelessWidget {
       'nim': '25051204423',
       'photo': 'assets/team/yesica.jpeg',
     },
-    {'name': 'Eka Putri', 'nim': '230000005', 'photo': 'assets/team/nama.jpg'},
+    {'name': 'Revaliza Aura Nabila', 
+     'nim': '25051204409',
+     'photo': 'assets/team/revaliza.jpeg'
+     },
     {
       'name': 'Mutiara Nur Hidayah',
       'nim': '25051204412',
