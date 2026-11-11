@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:expandable_page_view/expandable_page_view.dart';
 
 import 'detail_page.dart';
 import 'main.dart';
@@ -15,13 +17,45 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
+  final PageController _pageController = PageController();
+  
+  int _currentPage = 0;
+  bool _isAutoPlayActive = true;
+  
+  final int _jumlahBanner = 3;
+
+  // Diubah dari final agar bisa diubah saat filter diklik
   String _kategoriAktif = 'Semua';
   String _urutanHarga = 'Default';
   final Set<String> _favoritNama = {};
 
   @override
+  void initState() {
+    super.initState();
+    _startAutoPlayLoop();
+  }
+
+  void _startAutoPlayLoop() async {
+    while (_isAutoPlayActive && mounted) {
+      await Future.delayed(const Duration(seconds: 4));
+      if (!_isAutoPlayActive || !mounted) break;
+
+      if (_pageController.hasClients) {
+        _currentPage = (_currentPage + 1) % _jumlahBanner;
+        await _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
+  }
+
+  @override
   void dispose() {
+    _isAutoPlayActive = false;
     _searchController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -86,11 +120,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(width: 10),
-            Flexible(
+            const Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: const Text(
+                child: Text(
                   'SECONDHAND MOTORS',
                   style: TextStyle(
                     fontSize: 16,
@@ -103,7 +137,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-          // Tombol Dark Mode
           IconButton(
             tooltip: AppTheme.isDark ? 'Mode Terang' : 'Mode Gelap',
             onPressed: AppTheme.toggle,
@@ -113,17 +146,13 @@ class _HomePageState extends State<HomePage> {
                   : Icons.dark_mode_outlined,
             ),
           ),
-
-          // Tombol About
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: TextButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const AboutPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const AboutPage()),
                 );
               },
               icon: const Icon(Icons.info_outline_rounded, size: 18),
@@ -174,69 +203,187 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Banner Premium ala Showroom Kelas Atas
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(width < 600 ? 24 : 34),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1D2219)
-                                : const Color(0xFF1A1E17),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFB6D477),
-                                      shape: BoxShape.circle,
+                        // --- Banner Bergambar & Auto-Play Dinamis ---
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MouseRegion(
+                              onEnter: (_) => setState(() => _isAutoPlayActive = false),
+                              onExit: (_) {
+                                setState(() => _isAutoPlayActive = true);
+                                _startAutoPlayLoop();
+                              },
+                              child: GestureDetector(
+                                onTapDown: (_) => setState(() => _isAutoPlayActive = false),
+                                child: ExpandablePageView(
+                                  controller: _pageController,
+                                  onPageChanged: (index) {
+                                    setState(() {
+                                      _currentPage = index;
+                                    });
+                                  },
+                                  children: [
+                                    // BANNER 1
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Stack(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/banner.jpg',
+                                            width: double.infinity,
+                                            height: 180,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                Container(height: 180, color: isDark ? const Color(0xFF1D2219) : const Color(0xFF1A1E17)),
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 180,
+                                            color: Colors.black.withValues(alpha: 0.45),
+                                            padding: EdgeInsets.all(width < 600 ? 24 : 34),
+                                            child: const Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'VERIFIED PRE-OWNED SELECTION',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: Color(0xFFB6D477),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Koleksi Mobil & Motor Bekas Premium',
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'VERIFIED PRE-OWNED SELECTION',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.5,
-                                      color: Color(0xFFB6D477),
+
+                                    // BANNER 2
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Stack(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/banner2.jpg',
+                                            width: double.infinity,
+                                            height: 180,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                Container(height: 180, color: const Color(0xFF789449)),
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 180,
+                                            color: Colors.black.withValues(alpha: 0.45),
+                                            padding: EdgeInsets.all(width < 600 ? 24 : 34),
+                                            child: const Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'PROMO SPESIAL',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: Colors.white70,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Cicilan Ringan & Garansi Mesin',
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              const Text(
-                                'Koleksi Mobil & Motor Bekas Premium',
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  height: 1.15,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -0.5,
+
+                                    // BANNER 3
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Stack(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/banner3.jpg',
+                                            width: double.infinity,
+                                            height: 180,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                Container(height: 180, color: const Color(0xFF2C3E50)),
+                                          ),
+                                          Container(
+                                            width: double.infinity,
+                                            height: 180,
+                                            color: Colors.black.withValues(alpha: 0.45),
+                                            padding: EdgeInsets.all(width < 600 ? 24 : 34),
+                                            child: const Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'LAYANAN TRADE-IN',
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: Color(0xFFB6D477),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Tukar Tambah Kendaraan Semudah Kilat',
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Garansi mesin, surat lengkap, dan siap pakai.',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(_jumlahBanner, (index) {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                                  width: _currentPage == index ? 20 : 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: _currentPage == index
+                                        ? const Color(0xFF789449)
+                                        : theme.colorScheme.outlineVariant
+                                            .withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 22),
@@ -308,41 +455,20 @@ class _HomePageState extends State<HomePage> {
 
                         const SizedBox(height: 16),
 
-                        // Filter Kategori
+                        // Filter Kategori Chips
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              _buildChip(
-                                'Semua',
-                                Icons.grid_view_rounded,
-                                theme,
-                              ),
+                              _buildChip('Semua', Icons.grid_view_rounded, theme),
                               const SizedBox(width: 8),
-                              _buildChip(
-                                'Mobil',
-                                Icons.directions_car_filled_rounded,
-                                theme,
-                              ),
+                              _buildChip('Mobil', Icons.directions_car_filled_rounded, theme),
                               const SizedBox(width: 8),
-                              _buildChip(
-                                'Motor',
-                                Icons.two_wheeler_rounded,
-                                theme,
-                              ),
+                              _buildChip('Motor', Icons.two_wheeler_rounded, theme),
                               const SizedBox(width: 8),
-                              _buildChip(
-                                'Unggulan',
-                                Icons.verified_rounded,
-                                theme,
-                              ),
+                              _buildChip('Unggulan', Icons.verified_rounded, theme),
                               const SizedBox(width: 8),
-                              _buildChip(
-                                'Favorit (${_favoritNama.length})',
-                                Icons.favorite_rounded,
-                                theme,
-                                keyName: 'Favorit',
-                              ),
+                              _buildChip('Favorit (${_favoritNama.length})', Icons.favorite_rounded, theme, keyName: 'Favorit'),
                             ],
                           ),
                         ),
@@ -397,17 +523,15 @@ class _HomePageState extends State<HomePage> {
                         final kendaraan = _kendaraanTampil[index];
                         final isFav = _favoritNama.contains(kendaraan.nama);
 
-                        return _ShowroomCard(
+                        return ShowroomCard(
                           kendaraan: kendaraan,
                           isFavorite: isFav,
-                          onFavoriteToggle: () =>
-                              _toggleFavorit(kendaraan.nama),
+                          onFavoriteToggle: () => _toggleFavorit(kendaraan.nama),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    DetailPage(kendaraan: kendaraan),
+                                builder: (_) => DetailPage(kendaraan: kendaraan),
                               ),
                             );
                           },
@@ -465,13 +589,14 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _ShowroomCard extends StatelessWidget {
+class ShowroomCard extends StatelessWidget {
   final Kendaraan kendaraan;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
   final VoidCallback onTap;
 
-  const _ShowroomCard({
+  const ShowroomCard({
+    super.key,
     required this.kendaraan,
     required this.isFavorite,
     required this.onFavoriteToggle,
@@ -523,7 +648,6 @@ class _ShowroomCard extends StatelessWidget {
                             Container(color: const Color(0xFFEEF0E9)),
                       ),
                     ),
-                    // Badge Certified ala Referensi
                     Positioned(
                       top: 10,
                       left: 10,
@@ -557,7 +681,6 @@ class _ShowroomCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Tombol Favorit
                     Positioned(
                       top: 8,
                       right: 8,
