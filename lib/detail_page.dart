@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 import 'model/kendaraan_model.dart';
+import 'chat_page.dart';
 
 class DetailPage extends StatelessWidget {
   final Kendaraan kendaraan;
@@ -335,6 +336,37 @@ class DetailPage extends StatelessWidget {
                     fontSize: 13.5,
                     height: 1.6,
                     color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatPage(
+                            vehicleName: kendaraan.nama,
+                            initialMessage:
+                                'Halo Admin SecondHand, saya tertarik dengan '
+                                '${kendaraan.nama} ini. Apakah unitnya masih tersedia? '
+                                'Saya ingin mengetahui informasi lebih lanjut.',
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline_rounded),
+                    label: const Text('Chat Admin'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF557128),
+                      side: const BorderSide(color: Color(0xFF557128)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ),
               ],
