@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 import 'model/kendaraan_model.dart';
 
@@ -69,27 +70,69 @@ class DetailPage extends StatelessWidget {
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 900;
 
-            final imagePreview = ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: AspectRatio(
-                aspectRatio: isWide ? 1.1 : 1.35,
-                child: Hero(
-                  tag: 'veh-${kendaraan.nama}',
-                  child: Image.asset(
-                    kendaraan.gambar,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: const Color(0xFFEEF0E9),
-                        child: const Icon(
-                          Icons.directions_car_rounded,
-                          size: 65,
-                          color: Color(0xFF789449),
+            final imagePreview = GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black,
+                  builder: (dialogContext) {
+                    return Dialog(
+                      backgroundColor: Colors.black,
+                      insetPadding: const EdgeInsets.all(12),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: MediaQuery.of(dialogContext).size.height * 0.85,
+                        child: Stack(
+                          children: [
+                            PhotoView(
+                              imageProvider: AssetImage(kendaraan.gambar),
+                              backgroundDecoration: const BoxDecoration(
+                                color: Colors.black,
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    );
+                  },
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: AspectRatio(
+                  aspectRatio: isWide ? 1.1 : 1.35,
+                  child: Hero(
+                    tag: 'veh-${kendaraan.nama}',
+                    child: Image.asset(
+                      kendaraan.gambar,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: const Color(0xFFEEF0E9),
+                          child: const Icon(
+                            Icons.directions_car_rounded,
+                            size: 65,
+                            color: Color(0xFF789449),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
