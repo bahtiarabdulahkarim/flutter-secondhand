@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:redacted/redacted.dart';
+import 'package:lottie/lottie.dart';
 
 import 'detail_page.dart';
 import 'main.dart';
@@ -386,11 +387,62 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 if (!_isLoading && _kendaraanTampil.isEmpty)
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.all(40),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 30,
+                      ),
                       child: Center(
-                        child: Text('Tidak ada kendaraan yang sesuai.'),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 200,
+                              child: Lottie.asset(
+                                'assets/animations/no_search_results.json',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Kendaraan Tidak Ditemukan',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Maaf, kendaraan yang kamu cari belum tersedia.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _kategoriAktif = 'Semua';
+                                  _urutanHarga = 'Default';
+                                });
+                              },
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Reset Pencarian'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF789449),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
