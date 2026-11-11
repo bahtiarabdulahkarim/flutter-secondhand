@@ -1,12 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:expandable_page_view/expandable_page_view.dart';
+=======
+import 'package:redacted/redacted.dart';
+import 'package:lottie/lottie.dart';
+>>>>>>> origin
 
 import 'detail_page.dart';
 import 'main.dart';
 import 'model/kendaraan_model.dart';
 import 'profile_page.dart';
 import 'about_page.dart';
+import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,10 +34,12 @@ class _HomePageState extends State<HomePage> {
   String _kategoriAktif = 'Semua';
   String _urutanHarga = 'Default';
   final Set<String> _favoritNama = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
     _startAutoPlayLoop();
   }
 
@@ -57,6 +65,16 @@ class _HomePageState extends State<HomePage> {
     _searchController.dispose();
     _pageController.dispose();
     super.dispose();
+=======
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
+>>>>>>> origin
   }
 
   void _toggleFavorit(String nama) {
@@ -137,6 +155,21 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
+<<<<<<< HEAD
+=======
+          // Tombol Chat
+          IconButton(
+            tooltip: 'Chat Admin',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChatPage()),
+              );
+            },
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+          ),
+          // Tombol Dark Mode
+>>>>>>> origin
           IconButton(
             tooltip: AppTheme.isDark ? 'Mode Terang' : 'Mode Gelap',
             onPressed: AppTheme.toggle,
@@ -501,12 +534,63 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                if (_kendaraanTampil.isEmpty)
-                  const SliverToBoxAdapter(
+                if (!_isLoading && _kendaraanTampil.isEmpty)
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.all(40),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 30,
+                      ),
                       child: Center(
-                        child: Text('Tidak ada kendaraan yang sesuai.'),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 200,
+                              child: Lottie.asset(
+                                'assets/animations/no_search_results.json',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Kendaraan Tidak Ditemukan',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Maaf, kendaraan yang kamu cari belum tersedia.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _kategoriAktif = 'Semua';
+                                  _urutanHarga = 'Default';
+                                });
+                              },
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Reset Pencarian'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF789449),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -520,13 +604,30 @@ class _HomePageState extends State<HomePage> {
                     ),
                     sliver: SliverGrid(
                       delegate: SliverChildBuilderDelegate((context, index) {
-                        final kendaraan = _kendaraanTampil[index];
+                        final daftarUntukDitampilkan = _isLoading
+                            ? daftarKendaraan
+                            : _kendaraanTampil;
+
+                        if (daftarUntukDitampilkan.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final kendaraan =
+                            daftarUntukDitampilkan[index %
+                                daftarUntukDitampilkan.length];
+
                         final isFav = _favoritNama.contains(kendaraan.nama);
 
                         return ShowroomCard(
                           kendaraan: kendaraan,
                           isFavorite: isFav,
+<<<<<<< HEAD
                           onFavoriteToggle: () => _toggleFavorit(kendaraan.nama),
+=======
+                          isLoading: _isLoading,
+                          onFavoriteToggle: () =>
+                              _toggleFavorit(kendaraan.nama),
+>>>>>>> origin
                           onTap: () {
                             Navigator.push(
                               context,
@@ -535,8 +636,16 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           },
+                        ).redacted(
+                          context: context,
+                          redact: _isLoading,
+                          configuration: RedactedConfiguration(
+                            animationDuration: const Duration(
+                              milliseconds: 1500,
+                            ),
+                          ),
                         );
-                      }, childCount: _kendaraanTampil.length),
+                      }, childCount: _isLoading ? 6 : _kendaraanTampil.length),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: columns,
                         crossAxisSpacing: 14,
@@ -571,7 +680,20 @@ class _HomePageState extends State<HomePage> {
       label: Text(label),
       selected: selected,
       showCheckmark: false,
-      onSelected: (_) => setState(() => _kategoriAktif = val),
+      onSelected: (_) {
+        setState(() {
+          _kategoriAktif = val;
+          _isLoading = true;
+        });
+
+        Future.delayed(const Duration(milliseconds: 700), () {
+          if (!mounted) return;
+
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      },
       selectedColor: const Color(0xFF789449),
       backgroundColor: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -592,6 +714,7 @@ class _HomePageState extends State<HomePage> {
 class ShowroomCard extends StatelessWidget {
   final Kendaraan kendaraan;
   final bool isFavorite;
+  final bool isLoading;
   final VoidCallback onFavoriteToggle;
   final VoidCallback onTap;
 
@@ -599,6 +722,7 @@ class ShowroomCard extends StatelessWidget {
     super.key,
     required this.kendaraan,
     required this.isFavorite,
+    required this.isLoading,
     required this.onFavoriteToggle,
     required this.onTap,
   });
@@ -646,8 +770,9 @@ class ShowroomCard extends StatelessWidget {
                         alignment: Alignment.center,
                         errorBuilder: (context, error, stackTrace) =>
                             Container(color: const Color(0xFFEEF0E9)),
-                      ),
+                      ).redacted(context: context, redact: isLoading),
                     ),
+<<<<<<< HEAD
                     Positioned(
                       top: 10,
                       left: 10,
@@ -675,11 +800,44 @@ class ShowroomCard extends StatelessWidget {
                                 color: Colors.white,
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.w900,
+=======
+                    // Badge Certified ala Referensi
+                    if (!isLoading)
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.65),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.verified_rounded,
+                                size: 11,
+                                color: Color(0xFFB6D477),
+>>>>>>> origin
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 3),
+                              Text(
+                                'SM CERTIFIED',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+<<<<<<< HEAD
                     ),
                     Positioned(
                       top: 8,
@@ -700,11 +858,34 @@ class ShowroomCard extends StatelessWidget {
                               color: isFavorite
                                   ? const Color(0xFFFF5252)
                                   : Colors.white,
+=======
+                    // Tombol Favorit
+                    if (!isLoading)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Material(
+                          color: Colors.black.withValues(alpha: 0.35),
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: onFavoriteToggle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(7),
+                              child: Icon(
+                                isFavorite
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                size: 16,
+                                color: isFavorite
+                                    ? const Color(0xFFFF5252)
+                                    : Colors.white,
+                              ),
+>>>>>>> origin
                             ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -723,7 +904,7 @@ class ShowroomCard extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
-                      ),
+                      ).redacted(context: context, redact: isLoading),
                       const SizedBox(height: 3),
                       Text(
                         kendaraan.nama,
@@ -733,7 +914,7 @@ class ShowroomCard extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
-                      ),
+                      ).redacted(context: context, redact: isLoading),
                       const SizedBox(height: 6),
                       Text(
                         kendaraan.hargaFormat,
@@ -742,7 +923,7 @@ class ShowroomCard extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF789449),
                         ),
-                      ),
+                      ).redacted(context: context, redact: isLoading),
                       const Spacer(),
                       const Divider(height: 10, thickness: 0.5),
                       Row(

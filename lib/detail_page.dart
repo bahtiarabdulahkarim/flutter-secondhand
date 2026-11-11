@@ -1,11 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'model/kendaraan_model.dart';
+import 'chat_page.dart';
 
 class DetailPage extends StatelessWidget {
   final Kendaraan kendaraan;
 
   const DetailPage({super.key, required this.kendaraan});
+
+  Future<void> _bagikanKendaraan() async {
+    final informasiKendaraan =
+        '''
+  🚗 ${kendaraan.nama}
+
+  💰 Harga: ${kendaraan.hargaFormat}
+  📅 Tahun: ${kendaraan.tahun}
+  ⚙️ Transmisi: ${kendaraan.transmisi}
+  🛣️ Kilometer: ${kendaraan.kilometer}
+  ⛽ Bahan Bakar: ${kendaraan.bahanBakar}
+  📌 Kategori: ${kendaraan.kategori}
+
+  Deskripsi:
+  ${kendaraan.deskripsi}
+
+  Dibagikan melalui aplikasi Secondhand.
+  ''';
+
+    await SharePlus.instance.share(
+      ShareParams(title: 'Bagikan Kendaraan', text: informasiKendaraan),
+    );
+  }
 
   void _showActionDialog(BuildContext context, String actionType) {
     showDialog(
@@ -69,27 +95,69 @@ class DetailPage extends StatelessWidget {
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 900;
 
-            final imagePreview = ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: AspectRatio(
-                aspectRatio: isWide ? 1.1 : 1.35,
-                child: Hero(
-                  tag: 'veh-${kendaraan.nama}',
-                  child: Image.asset(
-                    kendaraan.gambar,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: const Color(0xFFEEF0E9),
-                        child: const Icon(
-                          Icons.directions_car_rounded,
-                          size: 65,
-                          color: Color(0xFF789449),
+            final imagePreview = GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black,
+                  builder: (dialogContext) {
+                    return Dialog(
+                      backgroundColor: Colors.black,
+                      insetPadding: const EdgeInsets.all(12),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: MediaQuery.of(dialogContext).size.height * 0.85,
+                        child: Stack(
+                          children: [
+                            PhotoView(
+                              imageProvider: AssetImage(kendaraan.gambar),
+                              backgroundDecoration: const BoxDecoration(
+                                color: Colors.black,
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    );
+                  },
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: AspectRatio(
+                  aspectRatio: isWide ? 1.1 : 1.35,
+                  child: Hero(
+                    tag: 'veh-${kendaraan.nama}',
+                    child: Image.asset(
+                      kendaraan.gambar,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: const Color(0xFFEEF0E9),
+                          child: const Icon(
+                            Icons.directions_car_rounded,
+                            size: 65,
+                            color: Color(0xFF789449),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -279,6 +347,33 @@ class DetailPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton.icon(
+                    onPressed: _bagikanKendaraan,
+                    icon: const Icon(Icons.share_rounded),
+                    label: const Text(
+                      'Bagikan Kendaraan',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF789449),
+                      side: const BorderSide(
+                        color: Color(0xFF789449),
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 24),
                 const Text(
@@ -292,6 +387,37 @@ class DetailPage extends StatelessWidget {
                     fontSize: 13.5,
                     height: 1.6,
                     color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatPage(
+                            vehicleName: kendaraan.nama,
+                            initialMessage:
+                                'Halo Admin SecondHand, saya tertarik dengan '
+                                '${kendaraan.nama} ini. Apakah unitnya masih tersedia? '
+                                'Saya ingin mengetahui informasi lebih lanjut.',
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline_rounded),
+                    label: const Text('Chat Admin'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF557128),
+                      side: const BorderSide(color: Color(0xFF557128)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ),
               ],
