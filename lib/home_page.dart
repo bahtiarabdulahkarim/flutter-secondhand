@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:redacted/redacted.dart';
 
 import 'detail_page.dart';
 import 'main.dart';
@@ -18,11 +19,20 @@ class _HomePageState extends State<HomePage> {
   String _kategoriAktif = 'Semua';
   String _urutanHarga = 'Default';
   final Set<String> _favoritNama = {};
+  bool _isLoading = true;
+  
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   void _toggleFavorit(String nama) {
@@ -375,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                if (_kendaraanTampil.isEmpty)
+                if (!_isLoading && _kendaraanTampil.isEmpty)
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.all(40),
@@ -394,25 +404,39 @@ class _HomePageState extends State<HomePage> {
                     ),
                     sliver: SliverGrid(
                       delegate: SliverChildBuilderDelegate((context, index) {
-                        final kendaraan = _kendaraanTampil[index];
+                        final daftarUntukDitampilkan =
+                            _isLoading ? daftarKendaraan : _kendaraanTampil;
+
+                        if (daftarUntukDitampilkan.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final kendaraan =
+                            daftarUntukDitampilkan[index % daftarUntukDitampilkan.length];
+
                         final isFav = _favoritNama.contains(kendaraan.nama);
 
                         return _ShowroomCard(
                           kendaraan: kendaraan,
                           isFavorite: isFav,
-                          onFavoriteToggle: () =>
-                              _toggleFavorit(kendaraan.nama),
+                          isLoading: _isLoading,
+                          onFavoriteToggle: () => _toggleFavorit(kendaraan.nama),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    DetailPage(kendaraan: kendaraan),
+                                builder: (_) => DetailPage(kendaraan: kendaraan),
                               ),
                             );
                           },
+                        ).redacted(
+                          context: context,
+                          redact: _isLoading,
+                          configuration: RedactedConfiguration(
+                            animationDuration: const Duration(milliseconds: 1500),
+                          ),
                         );
-                      }, childCount: _kendaraanTampil.length),
+                      }, childCount: _isLoading ? 6 : _kendaraanTampil.length),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: columns,
                         crossAxisSpacing: 14,
@@ -447,7 +471,20 @@ class _HomePageState extends State<HomePage> {
       label: Text(label),
       selected: selected,
       showCheckmark: false,
-      onSelected: (_) => setState(() => _kategoriAktif = val),
+      onSelected: (_) {
+        setState(() {
+          _kategoriAktif = val;
+          _isLoading = true;
+        });
+
+        Future.delayed(const Duration(milliseconds: 700), () {
+          if (!mounted) return;
+
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      },
       selectedColor: const Color(0xFF789449),
       backgroundColor: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -468,12 +505,14 @@ class _HomePageState extends State<HomePage> {
 class _ShowroomCard extends StatelessWidget {
   final Kendaraan kendaraan;
   final bool isFavorite;
+  final bool isLoading;
   final VoidCallback onFavoriteToggle;
   final VoidCallback onTap;
 
   const _ShowroomCard({
     required this.kendaraan,
     required this.isFavorite,
+    required this.isLoading,
     required this.onFavoriteToggle,
     required this.onTap,
   });
@@ -521,13 +560,17 @@ class _ShowroomCard extends StatelessWidget {
                         alignment: Alignment.center,
                         errorBuilder: (context, error, stackTrace) =>
                             Container(color: const Color(0xFFEEF0E9)),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
                       ),
                     ),
                     // Badge Certified ala Referensi
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
+                    if (!isLoading)
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
@@ -558,10 +601,11 @@ class _ShowroomCard extends StatelessWidget {
                       ),
                     ),
                     // Tombol Favorit
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Material(
+                    if (!isLoading)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Material(
                         color: Colors.black.withValues(alpha: 0.35),
                         shape: const CircleBorder(),
                         child: InkWell(
@@ -600,6 +644,9 @@ class _ShowroomCard extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
                       ),
                       const SizedBox(height: 3),
                       Text(
@@ -610,6 +657,9 @@ class _ShowroomCard extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -619,6 +669,9 @@ class _ShowroomCard extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF789449),
                         ),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
                       ),
                       const Spacer(),
                       const Divider(height: 10, thickness: 0.5),
