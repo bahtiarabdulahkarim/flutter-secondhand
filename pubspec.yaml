@@ -41,6 +41,7 @@ dependencies:
   redacted: ^1.0.13
   lottie: ^3.8.2
   chatview: ^3.0.0
+  share_plus: ^13.3.1
 
 dev_dependencies:
   flutter_test:

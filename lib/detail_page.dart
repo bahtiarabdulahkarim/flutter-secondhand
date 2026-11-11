@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'model/kendaraan_model.dart';
 import 'chat_page.dart';
@@ -8,6 +9,29 @@ class DetailPage extends StatelessWidget {
   final Kendaraan kendaraan;
 
   const DetailPage({super.key, required this.kendaraan});
+
+  Future<void> _bagikanKendaraan() async {
+    final informasiKendaraan =
+        '''
+  🚗 ${kendaraan.nama}
+
+  💰 Harga: ${kendaraan.hargaFormat}
+  📅 Tahun: ${kendaraan.tahun}
+  ⚙️ Transmisi: ${kendaraan.transmisi}
+  🛣️ Kilometer: ${kendaraan.kilometer}
+  ⛽ Bahan Bakar: ${kendaraan.bahanBakar}
+  📌 Kategori: ${kendaraan.kategori}
+
+  Deskripsi:
+  ${kendaraan.deskripsi}
+
+  Dibagikan melalui aplikasi Secondhand.
+  ''';
+
+    await SharePlus.instance.share(
+      ShareParams(title: 'Bagikan Kendaraan', text: informasiKendaraan),
+    );
+  }
 
   void _showActionDialog(BuildContext context, String actionType) {
     showDialog(
@@ -322,6 +346,33 @@ class DetailPage extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton.icon(
+                    onPressed: _bagikanKendaraan,
+                    icon: const Icon(Icons.share_rounded),
+                    label: const Text(
+                      'Bagikan Kendaraan',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF789449),
+                      side: const BorderSide(
+                        color: Color(0xFF789449),
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 24),
