@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:expandable_page_view/expandable_page_view.dart';
-=======
 import 'package:redacted/redacted.dart';
 import 'package:lottie/lottie.dart';
->>>>>>> origin
 
 import 'detail_page.dart';
 import 'main.dart';
@@ -39,8 +36,17 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
+
     _startAutoPlayLoop();
+
+    // Skeleton loading otomatis hilang setelah 3 detik
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   void _startAutoPlayLoop() async {
@@ -60,22 +66,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void dispose() {
-    _isAutoPlayActive = false;
-    _searchController.dispose();
-    _pageController.dispose();
-    super.dispose();
-=======
-
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-
-      setState(() {
-        _isLoading = false;
-      });
-    });
->>>>>>> origin
-  }
+    void dispose() {
+      _isAutoPlayActive = false;
+      _searchController.dispose();
+      _pageController.dispose();
+      super.dispose();
+    }
 
   void _toggleFavorit(String nama) {
     setState(() {
@@ -155,8 +151,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-<<<<<<< HEAD
-=======
+
           // Tombol Chat
           IconButton(
             tooltip: 'Chat Admin',
@@ -169,7 +164,7 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.chat_bubble_outline_rounded),
           ),
           // Tombol Dark Mode
->>>>>>> origin
+
           IconButton(
             tooltip: AppTheme.isDark ? 'Mode Terang' : 'Mode Gelap',
             onPressed: AppTheme.toggle,
@@ -621,13 +616,8 @@ class _HomePageState extends State<HomePage> {
                         return ShowroomCard(
                           kendaraan: kendaraan,
                           isFavorite: isFav,
-<<<<<<< HEAD
-                          onFavoriteToggle: () => _toggleFavorit(kendaraan.nama),
-=======
                           isLoading: _isLoading,
-                          onFavoriteToggle: () =>
-                              _toggleFavorit(kendaraan.nama),
->>>>>>> origin
+                          onFavoriteToggle: () => _toggleFavorit(kendaraan.nama),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -640,9 +630,7 @@ class _HomePageState extends State<HomePage> {
                           context: context,
                           redact: _isLoading,
                           configuration: RedactedConfiguration(
-                            animationDuration: const Duration(
-                              milliseconds: 1500,
-                            ),
+                            animationDuration: const Duration(milliseconds: 1500),
                           ),
                         );
                       }, childCount: _isLoading ? 6 : _kendaraanTampil.length),
@@ -769,39 +757,16 @@ class ShowroomCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
                         errorBuilder: (context, error, stackTrace) =>
-                            Container(color: const Color(0xFFEEF0E9)),
-                      ).redacted(context: context, redact: isLoading),
+                            Container(
+                          color: const Color(0xFFEEF0E9),
+                        ),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
+                      ),
                     ),
-<<<<<<< HEAD
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.65),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.verified_rounded,
-                              size: 11,
-                              color: Color(0xFFB6D477),
-                            ),
-                            SizedBox(width: 3),
-                            Text(
-                              'SM CERTIFIED',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.w900,
-=======
-                    // Badge Certified ala Referensi
+
+                    // Badge Certified
                     if (!isLoading)
                       Positioned(
                         top: 10,
@@ -822,7 +787,6 @@ class ShowroomCard extends StatelessWidget {
                                 Icons.verified_rounded,
                                 size: 11,
                                 color: Color(0xFFB6D477),
->>>>>>> origin
                               ),
                               SizedBox(width: 3),
                               Text(
@@ -837,28 +801,7 @@ class ShowroomCard extends StatelessWidget {
                           ),
                         ),
                       ),
-<<<<<<< HEAD
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Material(
-                        color: Colors.black.withValues(alpha: 0.35),
-                        shape: const CircleBorder(),
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: onFavoriteToggle,
-                          child: Padding(
-                            padding: const EdgeInsets.all(7),
-                            child: Icon(
-                              isFavorite
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border_rounded,
-                              size: 16,
-                              color: isFavorite
-                                  ? const Color(0xFFFF5252)
-                                  : Colors.white,
-=======
+
                     // Tombol Favorit
                     if (!isLoading)
                       Positioned(
@@ -881,7 +824,6 @@ class ShowroomCard extends StatelessWidget {
                                     ? const Color(0xFFFF5252)
                                     : Colors.white,
                               ),
->>>>>>> origin
                             ),
                           ),
                         ),
@@ -889,6 +831,7 @@ class ShowroomCard extends StatelessWidget {
                   ],
                 ),
               ),
+
               Expanded(
                 flex: 10,
                 child: Padding(
@@ -904,8 +847,13 @@ class ShowroomCard extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
-                      ).redacted(context: context, redact: isLoading),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
+                      ),
+
                       const SizedBox(height: 3),
+
                       Text(
                         kendaraan.nama,
                         maxLines: 1,
@@ -914,8 +862,13 @@ class ShowroomCard extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
-                      ).redacted(context: context, redact: isLoading),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
+                      ),
+
                       const SizedBox(height: 6),
+
                       Text(
                         kendaraan.hargaFormat,
                         style: const TextStyle(
@@ -923,9 +876,15 @@ class ShowroomCard extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF789449),
                         ),
-                      ).redacted(context: context, redact: isLoading),
+                      ).redacted(
+                        context: context,
+                        redact: isLoading,
+                      ),
+
                       const Spacer(),
+
                       const Divider(height: 10, thickness: 0.5),
+
                       Row(
                         children: [
                           Text(
@@ -936,7 +895,10 @@ class ShowroomCard extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          const Icon(Icons.arrow_forward_rounded, size: 14),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                          ),
                         ],
                       ),
                     ],

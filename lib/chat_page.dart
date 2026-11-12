@@ -252,15 +252,38 @@ class _ChatPageState extends State<ChatPage> {
                       ? const Color(0xFF141712)
                       : const Color(0xFFF6F7F3),
                 ),
+                sendMessageConfig: SendMessageConfiguration(
+                  textFieldBackgroundColor: Colors.white,
+                  textFieldConfig: TextFieldConfiguration(
+                    hintText: 'Ketik pesan...',
+                    textStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                    ),
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
                 chatBubbleConfig: ChatBubbleConfiguration(
                   outgoingChatBubbleConfig: ChatBubble(
                     color: const Color(0xFF557128),
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   inComingChatBubbleConfig: ChatBubble(
                     color: isDark
                         ? const Color(0xFF2B3422)
                         : const Color(0xFFEAF0DF),
+                    textStyle: TextStyle(
+                      color: isDark
+                          ? Colors.white
+                          : const Color(0xFF252A20),
+                      fontSize: 15,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
