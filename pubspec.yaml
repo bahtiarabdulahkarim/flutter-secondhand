@@ -43,6 +43,7 @@ dependencies:
   lottie: ^3.8.2 # dika : Menampilkan animasi Lottie
   chatview: ^3.0.0 #bahtiar : Membuat antarmuka chat
   share_plus: ^13.3.1 # dhea: Membagikan teks, tautan, atau file
+  flutter_rating_bar: ^4.0.1 #yesica: Rating bintang kendaraan
 
 dev_dependencies:
   flutter_test:

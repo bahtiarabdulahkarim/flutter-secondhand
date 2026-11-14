@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -391,6 +392,11 @@ class DetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
+                // --- Rating (flutter_rating_bar) ---
+                _RatingSection(namaKendaraan: kendaraan.nama),
+                const SizedBox(height: 16),
+                // -----------------------------------
+
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -492,6 +498,113 @@ class _SpecBlock extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RatingSection extends StatefulWidget {
+  final String namaKendaraan;
+
+  const _RatingSection({required this.namaKendaraan});
+
+  @override
+  State<_RatingSection> createState() => _RatingSectionState();
+}
+
+class _RatingSectionState extends State<_RatingSection> {
+  double _rating = 0;
+  bool _terkirim = false;
+
+  String get _label {
+    switch (_rating.ceil()) {
+      case 1:
+        return 'Sangat buruk';
+      case 2:
+        return 'Kurang baik';
+      case 3:
+        return 'Cukup';
+      case 4:
+        return 'Bagus';
+      case 5:
+        return 'Sangat bagus';
+      default:
+        return 'Ketuk bintang untuk menilai';
+    }
+  }
+
+  void _kirim() {
+    setState(() => _terkirim = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Terima kasih! Kamu memberi ${_rating.toInt()} bintang '
+          'untuk ${widget.namaKendaraan}.',
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E231B) : const Color(0xFFF1F4EB),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Beri Penilaian',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 10),
+          RatingBar.builder(
+            initialRating: _rating,
+            minRating: 1,
+            itemCount: 5,
+            itemSize: 36,
+            allowHalfRating: false,
+            ignoreGestures: _terkirim,
+            itemPadding: const EdgeInsets.symmetric(horizontal: 2),
+            itemBuilder: (context, _) =>
+                const Icon(Icons.star_rounded, color: Colors.amber),
+            onRatingUpdate: (value) => setState(() => _rating = value),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _terkirim ? 'Penilaian terkirim • $_label' : _label,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (!_terkirim) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: FilledButton(
+                onPressed: _rating > 0 ? _kirim : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF789449),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Kirim Penilaian'),
+              ),
+            ),
+          ],
         ],
       ),
     );
