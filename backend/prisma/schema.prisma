@@ -1,0 +1,561 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model activity_logs {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id     BigInt?  @db.UnsignedBigInt
+  action      String   @db.VarChar(100)
+  entity_type String?  @db.VarChar(100)
+  entity_id   BigInt?  @db.UnsignedBigInt
+  old_values  Json?
+  new_values  Json?
+  ip_address  String?  @db.VarChar(45)
+  user_agent  String?  @db.Text
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  users       users?   @relation(fields: [user_id], references: [id], map: "fk_activity_logs_user")
+
+  @@index([action], map: "idx_activity_logs_action")
+  @@index([created_at], map: "idx_activity_logs_created")
+  @@index([entity_type, entity_id], map: "idx_activity_logs_entity")
+  @@index([user_id], map: "idx_activity_logs_user")
+}
+
+model approvals {
+  id                                  BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  requested_by                        BigInt           @db.UnsignedBigInt
+  approved_by                         BigInt?          @db.UnsignedBigInt
+  action_type                         String           @db.VarChar(100)
+  entity_type                         String           @db.VarChar(100)
+  entity_id                           BigInt?          @db.UnsignedBigInt
+  request_data                        Json?
+  reason                              String?          @db.Text
+  status                              approvals_status @default(pending)
+  approval_notes                      String?          @db.Text
+  requested_at                        DateTime         @default(now()) @db.Timestamp(0)
+  reviewed_at                         DateTime?        @db.DateTime(0)
+  users_approvals_approved_byTousers  users?           @relation("approvals_approved_byTousers", fields: [approved_by], references: [id], map: "fk_approvals_approver")
+  users_approvals_requested_byTousers users            @relation("approvals_requested_byTousers", fields: [requested_by], references: [id], map: "fk_approvals_requester")
+
+  @@index([approved_by], map: "idx_approvals_approver")
+  @@index([entity_type, entity_id], map: "idx_approvals_entity")
+  @@index([requested_by], map: "idx_approvals_requester")
+  @@index([status], map: "idx_approvals_status")
+}
+
+model brands {
+  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  name           String           @unique(map: "uq_brands_name") @db.VarChar(100)
+  logo_url       String?          @db.VarChar(500)
+  created_at     DateTime         @default(now()) @db.DateTime(0)
+  updated_at     DateTime         @default(now()) @db.DateTime(0)
+  vehicle_models vehicle_models[]
+}
+
+model categories {
+  id             Int              @id @default(autoincrement()) @db.UnsignedTinyInt
+  name           String           @unique(map: "uq_categories_name") @db.VarChar(50)
+  slug           String           @unique(map: "uq_categories_slug") @db.VarChar(60)
+  description    String?          @db.VarChar(255)
+  created_at     DateTime         @default(now()) @db.DateTime(0)
+  vehicle_models vehicle_models[]
+}
+
+model conversation_participants {
+  id              BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  conversation_id BigInt        @db.UnsignedBigInt
+  user_id         BigInt        @db.UnsignedBigInt
+  joined_at       DateTime      @default(now()) @db.Timestamp(0)
+  last_read_at    DateTime?     @db.DateTime(0)
+  is_active       Boolean       @default(true)
+  conversations   conversations @relation(fields: [conversation_id], references: [id], onDelete: Cascade, map: "fk_participants_conversation")
+  users           users         @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_participants_user")
+
+  @@unique([conversation_id, user_id], map: "uq_conversation_participant")
+  @@index([user_id], map: "idx_conversation_participants_user")
+}
+
+model conversations {
+  id                        BigInt                          @id @default(autoincrement()) @db.UnsignedBigInt
+  conversation_code         String                          @unique(map: "conversation_code") @db.VarChar(50)
+  conversation_type         conversations_conversation_type @default(customer_admin)
+  created_by                BigInt                          @db.UnsignedBigInt
+  last_message_at           DateTime?                       @db.DateTime(0)
+  archived_at               DateTime?                       @db.DateTime(0)
+  created_at                DateTime                        @default(now()) @db.Timestamp(0)
+  updated_at                DateTime                        @default(now()) @db.Timestamp(0)
+  conversation_participants conversation_participants[]
+  users                     users                           @relation(fields: [created_by], references: [id], map: "fk_conversations_creator")
+  messages                  messages[]
+
+  @@index([created_by], map: "idx_conversations_creator")
+  @@index([last_message_at], map: "idx_conversations_last_message")
+}
+
+model message_attachments {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  message_id BigInt   @db.UnsignedBigInt
+  file_url   String   @db.VarChar(500)
+  file_name  String?  @db.VarChar(255)
+  file_type  String?  @db.VarChar(100)
+  file_size  BigInt?  @db.UnsignedBigInt
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  messages   messages @relation(fields: [message_id], references: [id], onDelete: Cascade, map: "fk_message_attachments_message")
+
+  @@index([message_id], map: "idx_message_attachments_message")
+}
+
+model messages {
+  id                               BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  conversation_id                  BigInt                @db.UnsignedBigInt
+  sender_id                        BigInt                @db.UnsignedBigInt
+  message_type                     messages_message_type @default(text)
+  message_content                  String?               @db.Text
+  sent_at                          DateTime              @default(now()) @db.Timestamp(0)
+  edited_at                        DateTime?             @db.DateTime(0)
+  deleted_at                       DateTime?             @db.DateTime(0)
+  deleted_by                       BigInt?               @db.UnsignedBigInt
+  deletion_reason                  String?               @db.VarChar(255)
+  message_attachments              message_attachments[]
+  conversations                    conversations         @relation(fields: [conversation_id], references: [id], onDelete: Cascade, map: "fk_messages_conversation")
+  users_messages_deleted_byTousers users?                @relation("messages_deleted_byTousers", fields: [deleted_by], references: [id], map: "fk_messages_deleted_by")
+  users_messages_sender_idTousers  users                 @relation("messages_sender_idTousers", fields: [sender_id], references: [id], map: "fk_messages_sender")
+
+  @@index([deleted_by], map: "fk_messages_deleted_by")
+  @@index([conversation_id], map: "idx_messages_conversation")
+  @@index([sender_id], map: "idx_messages_sender")
+  @@index([sent_at], map: "idx_messages_sent_at")
+}
+
+model notifications {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id           BigInt    @db.UnsignedBigInt
+  title             String    @db.VarChar(200)
+  message           String    @db.Text
+  notification_type String    @db.VarChar(50)
+  reference_type    String?   @db.VarChar(100)
+  reference_id      BigInt?   @db.UnsignedBigInt
+  is_read           Boolean   @default(false)
+  read_at           DateTime? @db.DateTime(0)
+  created_at        DateTime  @default(now()) @db.Timestamp(0)
+  users             users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_notifications_user")
+
+  @@index([created_at], map: "idx_notifications_created")
+  @@index([user_id, is_read], map: "idx_notifications_read")
+  @@index([reference_type, reference_id], map: "idx_notifications_reference")
+  @@index([user_id], map: "idx_notifications_user")
+}
+
+model roles {
+  id          Int          @id @default(autoincrement()) @db.UnsignedTinyInt
+  role_name   String       @unique(map: "uq_roles_role_name") @db.VarChar(30)
+  description String?      @db.VarChar(255)
+  created_at  DateTime     @default(now()) @db.DateTime(0)
+  user_roles  user_roles[]
+}
+
+model showroom_settings {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  showroom_name   String   @db.VarChar(150)
+  description     String?  @db.Text
+  address         String?  @db.Text
+  phone           String?  @db.VarChar(25)
+  email           String?  @db.VarChar(150)
+  logo_url        String?  @db.VarChar(500)
+  opening_hours   Json?
+  whatsapp_number String?  @db.VarChar(25)
+  updated_by      BigInt?  @db.UnsignedBigInt
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+  users           users?   @relation(fields: [updated_by], references: [id], map: "fk_showroom_settings_updater")
+
+  @@index([updated_by], map: "idx_showroom_settings_updater")
+}
+
+model test_drive_status_history {
+  id            BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  test_drive_id BigInt      @db.UnsignedBigInt
+  old_status    String?     @db.VarChar(30)
+  new_status    String      @db.VarChar(30)
+  changed_by    BigInt?     @db.UnsignedBigInt
+  notes         String?     @db.Text
+  created_at    DateTime    @default(now()) @db.Timestamp(0)
+  test_drives   test_drives @relation(fields: [test_drive_id], references: [id], onDelete: Cascade, map: "fk_test_drive_history_booking")
+  users         users?      @relation(fields: [changed_by], references: [id], map: "fk_test_drive_history_user")
+
+  @@index([test_drive_id], map: "idx_test_drive_history_booking")
+  @@index([created_at], map: "idx_test_drive_history_date")
+  @@index([changed_by], map: "idx_test_drive_history_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model test_drives {
+  id                                         BigInt                      @id @default(autoincrement()) @db.UnsignedBigInt
+  booking_code                               String                      @unique(map: "booking_code") @db.VarChar(50)
+  user_id                                    BigInt                      @db.UnsignedBigInt
+  vehicle_id                                 BigInt                      @db.UnsignedBigInt
+  assigned_admin_id                          BigInt?                     @db.UnsignedBigInt
+  scheduled_date                             DateTime                    @db.Date
+  start_time                                 DateTime                    @db.Time(0)
+  end_time                                   DateTime                    @db.Time(0)
+  status                                     test_drives_status          @default(pending)
+  customer_notes                             String?                     @db.Text
+  admin_notes                                String?                     @db.Text
+  approved_by                                BigInt?                     @db.UnsignedBigInt
+  approved_at                                DateTime?                   @db.DateTime(0)
+  created_at                                 DateTime                    @default(now()) @db.Timestamp(0)
+  updated_at                                 DateTime                    @default(now()) @db.Timestamp(0)
+  test_drive_status_history                  test_drive_status_history[]
+  users_test_drives_assigned_admin_idTousers users?                      @relation("test_drives_assigned_admin_idTousers", fields: [assigned_admin_id], references: [id], map: "fk_test_drives_admin")
+  users_test_drives_approved_byTousers       users?                      @relation("test_drives_approved_byTousers", fields: [approved_by], references: [id], map: "fk_test_drives_approver")
+  users_test_drives_user_idTousers           users                       @relation("test_drives_user_idTousers", fields: [user_id], references: [id], map: "fk_test_drives_user")
+  vehicles                                   vehicles                    @relation(fields: [vehicle_id], references: [id], map: "fk_test_drives_vehicle")
+
+  @@index([approved_by], map: "fk_test_drives_approver")
+  @@index([assigned_admin_id], map: "idx_test_drives_admin")
+  @@index([scheduled_date, start_time, end_time], map: "idx_test_drives_schedule")
+  @@index([status], map: "idx_test_drives_status")
+  @@index([user_id], map: "idx_test_drives_user")
+  @@index([vehicle_id], map: "idx_test_drives_vehicle")
+}
+
+model transaction_documents {
+  id                BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  transaction_id    BigInt       @db.UnsignedBigInt
+  document_type     String       @db.VarChar(50)
+  file_url          String       @db.VarChar(500)
+  original_filename String?      @db.VarChar(255)
+  uploaded_by       BigInt?      @db.UnsignedBigInt
+  created_at        DateTime     @default(now()) @db.Timestamp(0)
+  transactions      transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade, map: "fk_transaction_documents_transaction")
+  users             users?       @relation(fields: [uploaded_by], references: [id], map: "fk_transaction_documents_uploader")
+
+  @@index([transaction_id], map: "idx_transaction_documents_transaction")
+  @@index([uploaded_by], map: "idx_transaction_documents_uploader")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transaction_items {
+  id                        BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  transaction_id            BigInt       @db.UnsignedBigInt
+  vehicle_id                BigInt       @db.UnsignedBigInt
+  vehicle_title_snapshot    String       @db.VarChar(200)
+  vehicle_code_snapshot     String       @db.VarChar(50)
+  acquisition_cost_snapshot Decimal      @default(0.00) @db.Decimal(15, 2)
+  repair_cost_snapshot      Decimal      @default(0.00) @db.Decimal(15, 2)
+  other_cost_snapshot       Decimal      @default(0.00) @db.Decimal(15, 2)
+  sale_price                Decimal      @db.Decimal(15, 2)
+  discount_amount           Decimal      @default(0.00) @db.Decimal(15, 2)
+  created_at                DateTime     @default(now()) @db.Timestamp(0)
+  transactions              transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade, map: "fk_transaction_items_transaction")
+  vehicles                  vehicles     @relation(fields: [vehicle_id], references: [id], map: "fk_transaction_items_vehicle")
+
+  @@index([transaction_id], map: "idx_transaction_items_transaction")
+  @@index([vehicle_id], map: "idx_transaction_items_vehicle")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transaction_payments {
+  id               BigInt                              @id @default(autoincrement()) @db.UnsignedBigInt
+  transaction_id   BigInt                              @db.UnsignedBigInt
+  payment_method   transaction_payments_payment_method @default(cash)
+  amount           Decimal                             @db.Decimal(15, 2)
+  payment_date     DateTime?                           @db.DateTime(0)
+  payment_status   transaction_payments_payment_status @default(pending)
+  reference_number String?                             @db.VarChar(100)
+  proof_url        String?                             @db.VarChar(500)
+  verified_by      BigInt?                             @db.UnsignedBigInt
+  notes            String?                             @db.Text
+  created_at       DateTime                            @default(now()) @db.Timestamp(0)
+  transactions     transactions                        @relation(fields: [transaction_id], references: [id], onDelete: Cascade, map: "fk_transaction_payments_transaction")
+  users            users?                              @relation(fields: [verified_by], references: [id], map: "fk_transaction_payments_verifier")
+
+  @@index([payment_status], map: "idx_transaction_payments_status")
+  @@index([transaction_id], map: "idx_transaction_payments_transaction")
+  @@index([verified_by], map: "idx_transaction_payments_verifier")
+}
+
+model transaction_status_history {
+  id             BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  transaction_id BigInt       @db.UnsignedBigInt
+  old_status     String?      @db.VarChar(30)
+  new_status     String       @db.VarChar(30)
+  changed_by     BigInt?      @db.UnsignedBigInt
+  notes          String?      @db.Text
+  created_at     DateTime     @default(now()) @db.Timestamp(0)
+  transactions   transactions @relation(fields: [transaction_id], references: [id], onDelete: Cascade, map: "fk_transaction_status_history_transaction")
+  users          users?       @relation(fields: [changed_by], references: [id], map: "fk_transaction_status_history_user")
+
+  @@index([created_at], map: "idx_transaction_status_history_date")
+  @@index([transaction_id], map: "idx_transaction_status_history_transaction")
+  @@index([changed_by], map: "idx_transaction_status_history_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id                                    BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  transaction_code                      String                       @unique(map: "transaction_code") @db.VarChar(50)
+  customer_id                           BigInt                       @db.UnsignedBigInt
+  handled_by                            BigInt?                      @db.UnsignedBigInt
+  transaction_date                      DateTime                     @default(now()) @db.DateTime(0)
+  subtotal                              Decimal                      @default(0.00) @db.Decimal(15, 2)
+  discount                              Decimal                      @default(0.00) @db.Decimal(15, 2)
+  total_amount                          Decimal                      @default(0.00) @db.Decimal(15, 2)
+  status                                transactions_status          @default(pending)
+  notes                                 String?                      @db.Text
+  created_at                            DateTime                     @default(now()) @db.Timestamp(0)
+  updated_at                            DateTime                     @default(now()) @db.Timestamp(0)
+  transaction_documents                 transaction_documents[]
+  transaction_items                     transaction_items[]
+  transaction_payments                  transaction_payments[]
+  transaction_status_history            transaction_status_history[]
+  users_transactions_customer_idTousers users                        @relation("transactions_customer_idTousers", fields: [customer_id], references: [id], map: "fk_transactions_customer")
+  users_transactions_handled_byTousers  users?                       @relation("transactions_handled_byTousers", fields: [handled_by], references: [id], map: "fk_transactions_handler")
+
+  @@index([customer_id], map: "idx_transactions_customer")
+  @@index([transaction_date], map: "idx_transactions_date")
+  @@index([handled_by], map: "idx_transactions_handler")
+  @@index([status], map: "idx_transactions_status")
+}
+
+model user_addresses {
+  id              BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id         BigInt   @db.UnsignedBigInt
+  label           String?  @db.VarChar(50)
+  recipient_name  String   @db.VarChar(100)
+  recipient_phone String   @db.VarChar(20)
+  province        String?  @db.VarChar(100)
+  city            String?  @db.VarChar(100)
+  district        String?  @db.VarChar(100)
+  village         String?  @db.VarChar(100)
+  postal_code     String?  @db.VarChar(10)
+  full_address    String   @db.Text
+  is_default      Boolean  @default(false)
+  created_at      DateTime @default(now()) @db.DateTime(0)
+  updated_at      DateTime @default(now()) @db.DateTime(0)
+  users           users    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_addresses_user")
+
+  @@index([user_id, is_default], map: "idx_user_addresses_default")
+  @@index([user_id], map: "idx_user_addresses_user_id")
+}
+
+model user_roles {
+  id                                  BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id                             BigInt   @db.UnsignedBigInt
+  role_id                             Int      @db.UnsignedTinyInt
+  assigned_by                         BigInt?  @db.UnsignedBigInt
+  assigned_at                         DateTime @default(now()) @db.DateTime(0)
+  users_user_roles_assigned_byTousers users?   @relation("user_roles_assigned_byTousers", fields: [assigned_by], references: [id], map: "fk_user_roles_assigned_by")
+  roles                               roles    @relation(fields: [role_id], references: [id], map: "fk_user_roles_role")
+  users_user_roles_user_idTousers     users    @relation("user_roles_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_roles_user")
+
+  @@unique([user_id, role_id], map: "uq_user_roles_user_role")
+  @@index([assigned_by], map: "idx_user_roles_assigned_by")
+  @@index([role_id], map: "idx_user_roles_role_id")
+}
+
+model user_sessions {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id            BigInt    @db.UnsignedBigInt
+  refresh_token_hash String    @unique(map: "uq_user_sessions_token_hash") @db.VarChar(255)
+  device_name        String?   @db.VarChar(150)
+  ip_address         String?   @db.VarChar(45)
+  expires_at         DateTime  @db.DateTime(0)
+  revoked_at         DateTime? @db.DateTime(0)
+  created_at         DateTime  @default(now()) @db.DateTime(0)
+  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_user_sessions_user")
+
+  @@index([expires_at], map: "idx_user_sessions_expires_at")
+  @@index([revoked_at], map: "idx_user_sessions_revoked_at")
+  @@index([user_id], map: "idx_user_sessions_user_id")
+}
+
+model users {
+  id                                               BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  full_name                                        String                       @db.VarChar(100)
+  email                                            String                       @unique(map: "uq_users_email") @db.VarChar(150)
+  firebase_uid                                     String?                      @unique(map: "uq_users_firebase_uid") @db.VarChar(128)
+  phone                                            String?                      @db.VarChar(20)
+  password_hash                                    String                       @db.VarChar(255)
+  profile_photo                                    String?                      @db.VarChar(500)
+  is_active                                        Boolean                      @default(true)
+  email_verified_at                                DateTime?                    @db.DateTime(0)
+  last_login_at                                    DateTime?                    @db.DateTime(0)
+  created_at                                       DateTime                     @default(now()) @db.DateTime(0)
+  updated_at                                       DateTime                     @default(now()) @db.DateTime(0)
+  deleted_at                                       DateTime?                    @db.DateTime(0)
+  activity_logs                                    activity_logs[]
+  approvals_approvals_approved_byTousers           approvals[]                  @relation("approvals_approved_byTousers")
+  approvals_approvals_requested_byTousers          approvals[]                  @relation("approvals_requested_byTousers")
+  conversation_participants                        conversation_participants[]
+  conversations                                    conversations[]
+  messages_messages_deleted_byTousers              messages[]                   @relation("messages_deleted_byTousers")
+  messages_messages_sender_idTousers               messages[]                   @relation("messages_sender_idTousers")
+  notifications                                    notifications[]
+  showroom_settings                                showroom_settings[]
+  test_drive_status_history                        test_drive_status_history[]
+  test_drives_test_drives_assigned_admin_idTousers test_drives[]                @relation("test_drives_assigned_admin_idTousers")
+  test_drives_test_drives_approved_byTousers       test_drives[]                @relation("test_drives_approved_byTousers")
+  test_drives_test_drives_user_idTousers           test_drives[]                @relation("test_drives_user_idTousers")
+  transaction_documents                            transaction_documents[]
+  transaction_payments                             transaction_payments[]
+  transaction_status_history                       transaction_status_history[]
+  transactions_transactions_customer_idTousers     transactions[]               @relation("transactions_customer_idTousers")
+  transactions_transactions_handled_byTousers      transactions[]               @relation("transactions_handled_byTousers")
+  user_addresses                                   user_addresses[]
+  user_roles_user_roles_assigned_byTousers         user_roles[]                 @relation("user_roles_assigned_byTousers")
+  user_roles_user_roles_user_idTousers             user_roles[]                 @relation("user_roles_user_idTousers")
+  user_sessions                                    user_sessions[]
+  vehicle_costs                                    vehicle_costs[]
+  vehicles_vehicles_created_byTousers              vehicles[]                   @relation("vehicles_created_byTousers")
+  vehicles_vehicles_updated_byTousers              vehicles[]                   @relation("vehicles_updated_byTousers")
+
+  @@index([deleted_at], map: "idx_users_deleted_at")
+  @@index([is_active], map: "idx_users_is_active")
+  @@index([phone], map: "idx_users_phone")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vehicle_costs {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  vehicle_id   BigInt   @db.UnsignedBigInt
+  cost_type    String   @db.VarChar(30)
+  description  String?  @db.VarChar(255)
+  amount       Decimal  @db.Decimal(15, 2)
+  expense_date DateTime @db.Date
+  recorded_by  BigInt?  @db.UnsignedBigInt
+  created_at   DateTime @default(now()) @db.DateTime(0)
+  users        users?   @relation(fields: [recorded_by], references: [id], map: "fk_vehicle_costs_recorded_by")
+  vehicles     vehicles @relation(fields: [vehicle_id], references: [id], map: "fk_vehicle_costs_vehicle")
+
+  @@index([recorded_by], map: "fk_vehicle_costs_recorded_by")
+  @@index([cost_type], map: "idx_vehicle_costs_cost_type")
+  @@index([expense_date], map: "idx_vehicle_costs_expense_date")
+  @@index([vehicle_id], map: "idx_vehicle_costs_vehicle_id")
+}
+
+model vehicle_images {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  vehicle_id BigInt   @db.UnsignedBigInt
+  image_url  String   @db.VarChar(500)
+  public_id  String?  @db.VarChar(255)
+  is_primary Boolean  @default(false)
+  sort_order Int      @default(0) @db.UnsignedInt
+  created_at DateTime @default(now()) @db.DateTime(0)
+  vehicles   vehicles @relation(fields: [vehicle_id], references: [id], onDelete: Cascade, map: "fk_vehicle_images_vehicle")
+
+  @@index([vehicle_id, is_primary], map: "idx_vehicle_images_primary")
+  @@index([vehicle_id], map: "idx_vehicle_images_vehicle_id")
+}
+
+model vehicle_models {
+  id          BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  brand_id    BigInt     @db.UnsignedBigInt
+  category_id Int        @db.UnsignedTinyInt
+  model_name  String     @db.VarChar(100)
+  created_at  DateTime   @default(now()) @db.DateTime(0)
+  updated_at  DateTime   @default(now()) @db.DateTime(0)
+  brands      brands     @relation(fields: [brand_id], references: [id], map: "fk_vehicle_models_brand")
+  categories  categories @relation(fields: [category_id], references: [id], map: "fk_vehicle_models_category")
+  vehicles    vehicles[]
+
+  @@unique([brand_id, category_id, model_name], map: "uq_vehicle_models_brand_category_name")
+  @@index([category_id], map: "idx_vehicle_models_category_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vehicles {
+  id                               BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  model_id                         BigInt              @db.UnsignedBigInt
+  vehicle_code                     String              @unique(map: "uq_vehicles_vehicle_code") @db.VarChar(30)
+  title                            String              @db.VarChar(150)
+  year                             Int                 @db.Year
+  price                            Decimal             @db.Decimal(15, 2)
+  mileage                          Int?                @db.UnsignedInt
+  transmission                     String?             @db.VarChar(30)
+  fuel_type                        String?             @db.VarChar(30)
+  color                            String?             @db.VarChar(50)
+  engine_capacity                  Int?                @db.UnsignedInt
+  engine_number                    String?             @unique(map: "uq_vehicles_engine_number") @db.VarChar(100)
+  chassis_number                   String?             @unique(map: "uq_vehicles_chassis_number") @db.VarChar(100)
+  license_plate                    String?             @db.VarChar(20)
+  description                      String?             @db.Text
+  vehicle_condition                String              @default("good") @db.VarChar(30)
+  status                           String              @default("available") @db.VarChar(30)
+  is_featured                      Boolean             @default(false)
+  created_by                       BigInt?             @db.UnsignedBigInt
+  updated_by                       BigInt?             @db.UnsignedBigInt
+  created_at                       DateTime            @default(now()) @db.DateTime(0)
+  updated_at                       DateTime            @default(now()) @db.DateTime(0)
+  deleted_at                       DateTime?           @db.DateTime(0)
+  test_drives                      test_drives[]
+  transaction_items                transaction_items[]
+  vehicle_costs                    vehicle_costs[]
+  vehicle_images                   vehicle_images[]
+  users_vehicles_created_byTousers users?              @relation("vehicles_created_byTousers", fields: [created_by], references: [id], map: "fk_vehicles_created_by")
+  vehicle_models                   vehicle_models      @relation(fields: [model_id], references: [id], map: "fk_vehicles_model")
+  users_vehicles_updated_byTousers users?              @relation("vehicles_updated_byTousers", fields: [updated_by], references: [id], map: "fk_vehicles_updated_by")
+
+  @@index([created_by], map: "fk_vehicles_created_by")
+  @@index([updated_by], map: "fk_vehicles_updated_by")
+  @@index([created_at], map: "idx_vehicles_created_at")
+  @@index([deleted_at], map: "idx_vehicles_deleted_at")
+  @@index([is_featured], map: "idx_vehicles_is_featured")
+  @@index([model_id], map: "idx_vehicles_model_id")
+  @@index([price], map: "idx_vehicles_price")
+  @@index([status], map: "idx_vehicles_status")
+  @@index([year], map: "idx_vehicles_year")
+}
+
+enum conversations_conversation_type {
+  customer_admin
+  customer_owner
+  other
+}
+
+enum transaction_payments_payment_method {
+  cash
+  bank_transfer
+  e_wallet
+  other
+}
+
+enum messages_message_type {
+  text
+  image
+  file
+  system
+}
+
+enum transaction_payments_payment_status {
+  pending
+  verified
+  rejected
+}
+
+enum approvals_status {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+enum test_drives_status {
+  pending
+  approved
+  rejected
+  completed
+  cancelled
+}
+
+enum transactions_status {
+  pending
+  processing
+  completed
+  cancelled
+}

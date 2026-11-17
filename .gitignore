@@ -46,3 +46,22 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Python virtual environment
+.venv/
+venv/
+
+# Backend build output
+backend/dist/
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+firebase-service-account.json
+*-firebase-adminsdk-*.json
