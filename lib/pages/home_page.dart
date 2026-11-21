@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../widgets/home/home_navbar.dart';
 import '../widgets/home/home_hero_section.dart';
-import '../widgets/home/home_stats_card.dart';
 import '../widgets/home/featured_vehicle_section.dart';
 import '../widgets/home/vehicle_search_section.dart';
 import '../widgets/home/vehicle_category_section.dart';
@@ -20,10 +19,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // Warna tema
   static const Color backgroundColor = Color(0xFF0D1015);
-  static const Color surfaceColor = Color(0xFF191D24);
-  static const Color goldColor = Color(0xFFC9A45C);
-  static const Color textWhite = Colors.white;
-  static const Color textMuted = Color(0xFFA0A0A0);
 
   // State navigasi
   String activeNavMenu = 'Beranda';

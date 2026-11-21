@@ -47,7 +47,6 @@ class FeaturedVehicleSection extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             final isMobile = constraints.maxWidth < 650;
-            final columns = isMobile ? 1 : 2;
             const spacing = 20.0;
 
             final cardWidth = isMobile
