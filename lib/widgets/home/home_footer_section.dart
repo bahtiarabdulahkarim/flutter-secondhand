@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class HomeFooterSection extends StatelessWidget {
-  const HomeFooterSection({super.key});
+  final bool showBanner;
+
+  const HomeFooterSection({
+    super.key,
+    this.showBanner = true,
+  });
 
   static const Color gold = Color(0xFFD8B45F);
   static const Color panel = Color(0xFF242932);
@@ -18,6 +23,7 @@ class HomeFooterSection extends StatelessWidget {
       ),
       child: Column(
         children: [
+          if (showBanner)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(35),
