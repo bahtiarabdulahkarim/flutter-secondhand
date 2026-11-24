@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 class SearchResultsFilterSection extends StatelessWidget {
-  const SearchResultsFilterSection({super.key});
+  const SearchResultsFilterSection({
+    super.key,
+    required this.selectedModel,
+    required this.onModelSelected,
+  });
 
-  static const Color goldColor = Color(0xFFC9A45C);
-  static const Color panelColor = Color(0xFF191D24);
-  static const Color chipColor = Color(0xFF242932);
-  static const Color textWhite = Colors.white;
+  final String selectedModel;
+  final ValueChanged<String> onModelSelected;
+
   static const Color textMuted = Color(0xFFA0A0A0);
 
   @override
@@ -27,19 +30,10 @@ class SearchResultsFilterSection extends StatelessWidget {
                 fontSize: 10,
               ),
             ),
-            _ActiveFilterChip(label: 'Merek: Honda'),
-            _ActiveFilterChip(label: 'Semua Model (8 Unit)'),
-            _ActiveFilterChip(label: 'Kondisi: Terinspeksi 175-Titik'),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'Reset Semua Filter',
-                style: TextStyle(
-                  color: textMuted,
-                  fontSize: 10,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
+            const _ActiveFilterChip(label: 'Merek: Honda'),
+            const _ActiveFilterChip(label: 'Semua Model (4 Unit)'),
+            const _ActiveFilterChip(
+              label: 'Kondisi: Terinspeksi 175-Titik',
             ),
           ],
         ),
@@ -53,16 +47,34 @@ class SearchResultsFilterSection extends StatelessWidget {
             children: [
               _ModelChip(
                 label: 'Semua Honda',
-                count: 18,
-                selected: true,
+                count: 4,
+                selected: selectedModel == 'Semua Honda',
+                onTap: () => onModelSelected('Semua Honda'),
               ),
-              _ModelChip(label: 'Honda CR-V', count: 4),
-              _ModelChip(label: 'Honda HR-V', count: 3),
-              _ModelChip(label: 'Honda Civic RS & Turbo', count: 3),
-              _ModelChip(label: 'Honda Brio RS', count: 1),
-              _ModelChip(label: 'Honda Forza 250', count: 1),
-              _ModelChip(label: 'Honda CBR250RR SP', count: 2),
-              _ModelChip(label: 'Honda ADV', count: 4),
+              _ModelChip(
+                label: 'Honda CR-V',
+                count: 1,
+                selected: selectedModel == 'Honda CR-V',
+                onTap: () => onModelSelected('Honda CR-V'),
+              ),
+              _ModelChip(
+                label: 'Honda HR-V',
+                count: 1,
+                selected: selectedModel == 'Honda HR-V',
+                onTap: () => onModelSelected('Honda HR-V'),
+              ),
+              _ModelChip(
+                label: 'Honda Civic RS & Turbo',
+                count: 1,
+                selected: selectedModel == 'Honda Civic RS & Turbo',
+                onTap: () => onModelSelected('Honda Civic RS & Turbo'),
+              ),
+              _ModelChip(
+                label: 'Honda Brio RS',
+                count: 1,
+                selected: selectedModel == 'Honda Brio RS',
+                onTap: () => onModelSelected('Honda Brio RS'),
+              ),
             ],
           ),
         ),
@@ -114,56 +126,61 @@ class _ModelChip extends StatelessWidget {
     required this.label,
     required this.count,
     this.selected = false,
+    this.onTap,
   });
 
   final String label;
   final int count;
   final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 13,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFFC9A45C) : const Color(0xFF191D24),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: selected ? const Color(0xFF191D24) : Colors.white,
-              fontSize: 10,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-          const SizedBox(width: 7),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 5,
-              vertical: 2,
-            ),
-            decoration: BoxDecoration(
-              color: selected
-                  ? const Color(0xFF9D7938)
-                  : const Color(0xFF303640),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '$count',
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 13,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFFC9A45C) : const Color(0xFF191D24),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
               style: TextStyle(
-                color: selected ? Colors.white : const Color(0xFFA0A0A0),
-                fontSize: 9,
+                color: selected ? const Color(0xFF191D24) : Colors.white,
+                fontSize: 10,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 7),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 5,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: selected
+                    ? const Color(0xFF9D7938)
+                    : const Color(0xFF303640),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$count',
+                style: TextStyle(
+                  color: selected ? Colors.white : const Color(0xFFA0A0A0),
+                  fontSize: 9,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../model/kendaraan_model.dart';
+import '../models/kendaraan_model.dart';
 import 'chat_page.dart';
 
 class DetailPage extends StatelessWidget {

@@ -8,6 +8,7 @@ import '../widgets/search_results/vehicle_listing/vehicle_listing_footer.dart';
 import '../widgets/search_results/vehicle_sourcing_banner.dart';
 import '../widgets/home/home_footer_section.dart';
 import '../widgets/home/home_navbar.dart';
+import '../data/vehicle_data.dart';
 
 class VehicleSearchResultsPage extends StatefulWidget {
   const VehicleSearchResultsPage({super.key});
@@ -19,12 +20,131 @@ class VehicleSearchResultsPage extends StatefulWidget {
 
 class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   static const Color backgroundColor = Color(0xFF0D1015);
-  static const Color goldColor = Color(0xFFC9A45C);
-  static const Color textWhite = Colors.white;
-  static const Color textMuted = Color(0xFFA0A0A0);
+
+  String selectedModel = 'Semua Honda';
+  String selectedPrice = 'Rp30 Jt - Rp600 Jt';
+  String selectedYear = '2019 - 2024';
+  String selectedTransmission = 'Semua';
+  String selectedOdometer = 'Semua';
+  String selectedLocation = 'Semua Area';
+
+  void selectModel(String model) {
+    setState(() {
+      selectedModel = model;
+    });
+  }
+
+  void selectPrice(String price) {
+    setState(() {
+      selectedPrice = price;
+    });
+  }
+
+  void selectYear(String year) {
+    setState(() {
+      selectedYear = year;
+    });
+  }
+
+  void selectTransmission(String transmission) {
+    setState(() {
+      selectedTransmission = transmission;
+    });
+  }
+
+  void selectOdometer(String odometer) {
+    setState(() {
+      selectedOdometer = odometer;
+    });
+  }
+
+  void selectLocation(String location) {
+    setState(() {
+      selectedLocation = location;
+    });
+  }
+
+  void resetFilters() {
+    setState(() {
+      selectedModel = 'Semua Honda';
+      selectedPrice = 'Rp30 Jt - Rp600 Jt';
+      selectedYear = '2019 - 2024';
+      selectedTransmission = 'Semua';
+      selectedOdometer = 'Semua';
+      selectedLocation = 'Semua Area';
+    });
+  }
+
+  Map<String, int?> getPriceRange() {
+    switch (selectedPrice) {
+      case 'Rp30 Jt - Rp100 Jt':
+        return {'min': 30000000, 'max': 100000000};
+
+      case 'Rp100 Jt - Rp300 Jt':
+        return {'min': 100000000, 'max': 300000000};
+
+      case 'Rp300 Jt - Rp600 Jt':
+        return {'min': 300000000, 'max': 600000000};
+
+      default:
+        return {'min': 30000000, 'max': 600000000};
+    }
+  }
+
+  Map<String, int?> getYearRange() {
+    switch (selectedYear) {
+      case '2019 - 2020':
+        return {'min': 2019, 'max': 2020};
+
+      case '2021 - 2022':
+        return {'min': 2021, 'max': 2022};
+
+      case '2023 - 2024':
+        return {'min': 2023, 'max': 2024};
+
+      default:
+        return {'min': 2019, 'max': 2024};
+    }
+  }
+
+  Map<String, int?> getOdometerRange() {
+    switch (selectedOdometer) {
+      case '< 30.000 KM':
+        return {'min': null, 'max': 29999};
+
+      case '30.000 - 60.000 KM':
+        return {'min': 30000, 'max': 60000};
+
+      case '> 60.000 KM':
+        return {'min': 60001, 'max': null};
+
+      default:
+        return {'min': null, 'max': null};
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final priceRange = getPriceRange();
+    final yearRange = getYearRange();
+    final odometerRange = getOdometerRange();
+
+    final filteredVehicles = VehicleData.filterVehicles(
+      brand: 'Honda',
+      location: selectedLocation == 'Semua Area'
+        ? null
+        : selectedLocation,
+      model: selectedModel == 'Semua Honda' ? null : selectedModel,
+      minPrice: priceRange['min'],
+      maxPrice: priceRange['max'],
+      minYear: yearRange['min'],
+      maxYear: yearRange['max'],
+      minOdometer: odometerRange['min'],
+      maxOdometer: odometerRange['max'],
+      transmission: selectedTransmission == 'Semua'
+        ? null
+        : selectedTransmission,
+    );
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
@@ -41,16 +161,31 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(32),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SearchResultsHeader(),
                   SizedBox(height: 20),
-                  SearchResultsFilterSection(),
+                  SearchResultsFilterSection(
+                    selectedModel: selectedModel,
+                    onModelSelected: selectModel,
+                  ),
                   SizedBox(height: 20),
-                  SearchResultsToolbar(),
+                  SearchResultsToolbar(
+                    selectedPrice: selectedPrice,
+                    onPriceSelected: selectPrice,
+                    selectedYear: selectedYear,
+                    onYearSelected: selectYear,
+                    selectedTransmission: selectedTransmission,
+                    onTransmissionSelected: selectTransmission,
+                    selectedOdometer: selectedOdometer,
+                    onOdometerSelected: selectOdometer,
+                    selectedLocation: selectedLocation,
+                    onLocationSelected: selectLocation,
+                    onResetFilters: resetFilters,
+                  ),
                   SizedBox(height: 24),
-                  VehicleListingSection(),
+                  VehicleListingSection(vehicles: filteredVehicles),
                   SizedBox(height: 20),
                   VehicleListingFooter(),
                   SizedBox(height: 32),

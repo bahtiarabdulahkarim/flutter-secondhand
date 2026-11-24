@@ -1,14 +1,45 @@
-
 import 'package:flutter/material.dart';
 
-class SearchResultsToolbar extends StatelessWidget {
-  const SearchResultsToolbar({super.key});
+class SearchResultsToolbar extends StatefulWidget {
+  const SearchResultsToolbar({
+    super.key,
+    required this.selectedPrice,
+    required this.onPriceSelected,
+    required this.selectedYear,
+    required this.onYearSelected,
+    required this.selectedTransmission,
+    required this.onTransmissionSelected,
+    required this.selectedOdometer,
+    required this.onOdometerSelected,
+    required this.selectedLocation,
+    required this.onLocationSelected,
+    required this.onResetFilters,
+  });
+
+  final String selectedPrice;
+  final ValueChanged<String> onPriceSelected;
+  final String selectedYear;
+  final ValueChanged<String> onYearSelected;
+  final String selectedTransmission;
+  final ValueChanged<String> onTransmissionSelected;
+  final String selectedOdometer;
+  final ValueChanged<String> onOdometerSelected;
+  final String selectedLocation;
+  final ValueChanged<String> onLocationSelected;
+  final VoidCallback onResetFilters;
+  
+  @override
+  State<SearchResultsToolbar> createState() => _SearchResultsToolbarState();
+}
+
+class _SearchResultsToolbarState extends State<SearchResultsToolbar> {
+  String selectedYear = '2019 - 2024';
+  String selectedTransmission = 'Semua';
+  String selectedOdometer = 'Semua';
+  String selectedLocation = 'Semua Area';
 
   static const Color panelColor = Color(0xFF191D24);
-  static const Color fieldColor = Color(0xFF242932);
-  static const Color textWhite = Colors.white;
   static const Color textMuted = Color(0xFFA0A0A0);
-  static const Color goldColor = Color(0xFFC9A45C);
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +60,27 @@ class SearchResultsToolbar extends StatelessWidget {
           Wrap(
             spacing: 5,
             runSpacing: 8,
-            children: const [
-              _FilterDropdown(label: 'Harga: Rp30 Jt - Rp600 Jt'),
-              _FilterDropdown(label: 'Tahun: 2019 - 2024'),
-              _FilterDropdown(label: 'Transmisi: Semua (CVT/AT/MT)'),
-              _FilterDropdown(label: 'Odometer: < 30.000 KM'),
-              _FilterDropdown(label: 'Lokasi Hub: Semua Area'),
+            children: [
+              _PriceFilterDropdown(
+                label: 'Harga: ${widget.selectedPrice}',
+                onSelected: widget.onPriceSelected,
+              ),
+              _YearFilterDropdown(
+                label: 'Tahun: ${widget.selectedYear}',
+                onSelected: widget.onYearSelected,
+              ),
+              _TransmissionFilterDropdown(
+                label: 'Transmisi: ${widget.selectedTransmission}',
+                onSelected: widget.onTransmissionSelected,
+              ),
+              _OdometerFilterDropdown(
+                label: 'Odometer: ${widget.selectedOdometer}',
+                onSelected: widget.onOdometerSelected,
+              ),
+              _LocationFilterDropdown(
+                label: 'Lokasi: ${widget.selectedLocation}',
+                onSelected: widget.onLocationSelected,
+              ),
             ],
           ),
 
@@ -42,7 +88,17 @@ class SearchResultsToolbar extends StatelessWidget {
           Wrap(
             spacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: const [
+            children: [
+              TextButton(
+                onPressed: widget.onResetFilters,
+                child: const Text(
+                  'Reset Filter',
+                  style: TextStyle(
+                    color: Color(0xFFC9A45C),
+                    fontSize: 10,
+                  ),
+                ),
+              ),
               Text(
                 'Urutkan:',
                 style: TextStyle(
@@ -66,39 +122,347 @@ class SearchResultsToolbar extends StatelessWidget {
   }
 }
 
-class _FilterDropdown extends StatelessWidget {
-  const _FilterDropdown({required this.label});
+class _PriceFilterDropdown extends StatelessWidget {
+  const _PriceFilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
 
   final String label;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 10,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF242932),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'Rp30 Jt - Rp100 Jt',
+          child: Text(
+            'Rp30 Jt - Rp100 Jt',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Rp100 Jt - Rp300 Jt',
+          child: Text(
+            'Rp100 Jt - Rp300 Jt',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Rp300 Jt - Rp600 Jt',
+          child: Text(
+            'Rp300 Jt - Rp600 Jt',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
             ),
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFFA0A0A0),
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _YearFilterDropdown extends StatelessWidget {
+  const _YearFilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
+
+  final String label;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: '2019 - 2020',
+          child: Text(
+            '2019 - 2020',
+            style: TextStyle(color: Colors.white),
           ),
-          const SizedBox(width: 7),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            color: Color(0xFFA0A0A0),
-            size: 15,
+        ),
+        const PopupMenuItem(
+          value: '2021 - 2022',
+          child: Text(
+            '2021 - 2022',
+            style: TextStyle(color: Colors.white),
           ),
-        ],
+        ),
+        const PopupMenuItem(
+          value: '2023 - 2024',
+          child: Text(
+            '2023 - 2024',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFFA0A0A0),
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TransmissionFilterDropdown extends StatelessWidget {
+  const _TransmissionFilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
+
+  final String label;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'Semua',
+          child: Text(
+            'Semua Transmisi',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'CVT',
+          child: Text('CVT', style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: 'AT',
+          child: Text('Otomatis (AT)', style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: 'MT',
+          child: Text('Manual (MT)', style: TextStyle(color: Colors.white)),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFFA0A0A0),
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OdometerFilterDropdown extends StatelessWidget {
+  const _OdometerFilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
+
+  final String label;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'Semua',
+          child: Text('Semua Odometer',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: '< 30.000 KM',
+          child: Text('< 30.000 KM',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: '30.000 - 60.000 KM',
+          child: Text('30.000 - 60.000 KM',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: '> 60.000 KM',
+          child: Text('> 60.000 KM',
+              style: TextStyle(color: Colors.white)),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFFA0A0A0),
+              size: 15,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LocationFilterDropdown extends StatelessWidget {
+  const _LocationFilterDropdown({
+    required this.label,
+    required this.onSelected,
+  });
+
+  final String label;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'Semua Area',
+          child: Text('Semua Area',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: 'Jakarta Selatan',
+          child: Text('Jakarta Selatan',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: 'Jakarta Utara',
+          child: Text('Jakarta Utara',
+              style: TextStyle(color: Colors.white)),
+        ),
+        const PopupMenuItem(
+          value: 'Bandung',
+          child: Text('Bandung',
+              style: TextStyle(color: Colors.white)),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
+            ),
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFFA0A0A0),
+              size: 15,
+            ),
+          ],
+        ),
       ),
     );
   }
