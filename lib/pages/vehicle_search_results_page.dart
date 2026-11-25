@@ -29,39 +29,48 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   String selectedOdometer = 'Semua';
   String selectedLocation = 'Semua Area';
 
+  int currentPage = 1;
+  static const int itemsPerPage = 10;
+
   void selectModel(String model) {
     setState(() {
       selectedModel = model;
+      currentPage = 1;
     });
   }
 
   void selectPrice(String price) {
     setState(() {
       selectedPrice = price;
+      currentPage = 1;
     });
   }
 
   void selectYear(String year) {
     setState(() {
       selectedYear = year;
+      currentPage = 1;
     });
   }
 
   void selectTransmission(String transmission) {
     setState(() {
       selectedTransmission = transmission;
+      currentPage = 1;
     });
   }
 
   void selectOdometer(String odometer) {
     setState(() {
       selectedOdometer = odometer;
+      currentPage = 1;
     });
   }
 
   void selectLocation(String location) {
     setState(() {
       selectedLocation = location;
+      currentPage = 1;
     });
   }
 
@@ -80,6 +89,12 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   void selectSort(String sort) {
     setState(() {
       selectedSort = sort;
+    });
+  }
+
+  void selectPage(int page) {
+    setState(() {
+      currentPage = page;
     });
   }
 
@@ -154,6 +169,19 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
         : selectedTransmission,
       sortBy: selectedSort,
     );
+    final totalPages = (filteredVehicles.length / itemsPerPage).ceil();
+
+    final startIndex = (currentPage - 1) * itemsPerPage;
+
+    final endIndex = (startIndex + itemsPerPage) > filteredVehicles.length
+        ? filteredVehicles.length
+        : startIndex + itemsPerPage;
+
+    final paginatedVehicles = filteredVehicles.sublist(
+      startIndex,
+      endIndex,
+    );
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Column(
@@ -196,9 +224,15 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
                     onSortSelected: selectSort,
                   ),
                   SizedBox(height: 24),
-                  VehicleListingSection(vehicles: filteredVehicles),
+                  VehicleListingSection(vehicles: paginatedVehicles),
                   SizedBox(height: 20),
-                  VehicleListingFooter(),
+                  VehicleListingFooter(
+                    currentPage: currentPage,
+                    totalPages: totalPages,
+                    totalItems: filteredVehicles.length,
+                    itemsPerPage: itemsPerPage,
+                    onPageSelected: selectPage,
+                  ),
                   SizedBox(height: 32),
                   VehicleSourcingBanner(),
                   HomeFooterSection(showBanner: false),

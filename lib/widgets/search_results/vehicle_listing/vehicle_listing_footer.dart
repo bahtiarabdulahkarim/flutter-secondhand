@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 
 class VehicleListingFooter extends StatelessWidget {
-  const VehicleListingFooter({super.key});
+  const VehicleListingFooter({
+    super.key,
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalItems,
+    required this.itemsPerPage,
+    required this.onPageSelected,
+  });
+
+  final int currentPage;
+  final int totalPages;
+  final int totalItems;
+  final int itemsPerPage;
+  final ValueChanged<int> onPageSelected;
 
   static const Color goldColor = Color(0xFFC9A45C);
   static const Color textWhite = Colors.white;
@@ -22,31 +35,47 @@ class VehicleListingFooter extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < 700) {
-            return const Column(
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ResultInformation(),
-                SizedBox(height: 16),
-                _ServiceInformation(),
-                SizedBox(height: 16),
-                _PaginationControls(),
+                _ResultInformation(
+                  currentPage: currentPage,
+                  totalItems: totalItems,
+                  itemsPerPage: itemsPerPage,
+                ),
+                const SizedBox(height: 16),
+                const _ServiceInformation(),
+                const SizedBox(height: 16),
+                _PaginationControls(
+                  currentPage: currentPage,
+                  totalPages: totalPages,
+                  onPageSelected: onPageSelected,
+                ),
               ],
             );
           }
 
-          return const Row(
+          return Row(
             children: [
               Expanded(
                 flex: 4,
-                child: _ResultInformation(),
+                child: _ResultInformation(
+                  currentPage: currentPage,
+                  totalItems: totalItems,
+                  itemsPerPage: itemsPerPage,
+                ),
               ),
-              SizedBox(width: 20),
-              Expanded(
+              const SizedBox(width: 20),
+              const Expanded(
                 flex: 6,
                 child: _ServiceInformation(),
               ),
-              SizedBox(width: 20),
-              _PaginationControls(),
+              const SizedBox(width: 20),
+              _PaginationControls(
+                currentPage: currentPage,
+                totalPages: totalPages,
+                onPageSelected: onPageSelected,
+              ),
             ],
           );
         },
@@ -56,11 +85,28 @@ class VehicleListingFooter extends StatelessWidget {
 }
 
 class _ResultInformation extends StatelessWidget {
-  const _ResultInformation();
+  const _ResultInformation({
+    required this.currentPage,
+    required this.totalItems,
+    required this.itemsPerPage,
+  });
+
+  final int currentPage;
+  final int totalItems;
+  final int itemsPerPage;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+
+    final startItem = totalItems == 0
+        ? 0
+        : (currentPage - 1) * itemsPerPage + 1;
+
+    final endItem = (currentPage * itemsPerPage) > totalItems
+        ? totalItems
+        : currentPage * itemsPerPage;
+
+    return Row(
       children: [
         Icon(
           Icons.verified_outlined,
@@ -73,7 +119,7 @@ class _ResultInformation extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Menampilkan 1–18 dari total 18 Unit Honda',
+                'Menampilkan $startItem–$endItem dari total $totalItems Unit Honda',
                 style: TextStyle(
                   color: VehicleListingFooter.textMuted,
                   fontSize: 12,
@@ -124,25 +170,42 @@ class _ServiceInformation extends StatelessWidget {
 }
 
 class _PaginationControls extends StatelessWidget {
-  const _PaginationControls();
+  const _PaginationControls({
+    required this.currentPage,
+    required this.totalPages,
+    required this.onPageSelected,
+  });
+
+  final int currentPage;
+  final int totalPages;
+  final ValueChanged<int> onPageSelected;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          Icons.chevron_left,
-          color: Colors.white30,
-          size: 20,
-        ),
-        SizedBox(width: 12),
-        _PageNumber(),
-        SizedBox(width: 12),
-        Icon(
-          Icons.chevron_right,
+        IconButton(
+          onPressed: currentPage > 1
+              ? () => onPageSelected(currentPage - 1)
+              : null,
+          icon: const Icon(Icons.chevron_left),
           color: VehicleListingFooter.textMuted,
-          size: 20,
+          disabledColor: Colors.white30,
+        ),
+        const SizedBox(width: 8),
+        _PageNumber(
+          currentPage: currentPage,
+          totalPages: totalPages,
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          onPressed: currentPage < totalPages
+              ? () => onPageSelected(currentPage + 1)
+              : null,
+          icon: const Icon(Icons.chevron_right),
+          color: VehicleListingFooter.textMuted,
+          disabledColor: Colors.white30,
         ),
       ],
     );
@@ -150,21 +213,27 @@ class _PaginationControls extends StatelessWidget {
 }
 
 class _PageNumber extends StatelessWidget {
-  const _PageNumber();
+  const _PageNumber({
+    required this.currentPage,
+    required this.totalPages,
+  });
+
+  final int currentPage;
+  final int totalPages;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 34,
+      width: 56,
       height: 34,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: VehicleListingFooter.goldColor,
         borderRadius: BorderRadius.circular(5),
       ),
-      child: const Text(
-        '1',
-        style: TextStyle(
+      child: Text(
+        '$currentPage / $totalPages',
+        style: const TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
           fontSize: 12,
