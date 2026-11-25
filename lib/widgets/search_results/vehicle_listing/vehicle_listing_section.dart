@@ -8,9 +8,11 @@ class VehicleListingSection extends StatelessWidget {
   const VehicleListingSection({
     super.key,
     required this.vehicles,
+    this.isListView = false,
   });
 
   final List<VehicleModel> vehicles;
+  final bool isListView;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,29 @@ class VehicleListingSection extends StatelessWidget {
             : screenWidth >= 700
                 ? 2
                 : 1;
+
+        if (isListView) {
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: vehicles.length,
+            separatorBuilder: (context, index) =>
+                const SizedBox(height: 18),
+            itemBuilder: (context, index) {
+              final vehicle = vehicles[index];
+
+              return VehicleCardItem(
+                imageUrl: vehicle.imageUrl,
+                title: vehicle.name,
+                specs:
+                    '${vehicle.year} • ${vehicle.odometer} Km • ${vehicle.transmission}',
+                price: formatRupiah(vehicle.price),
+                grade: vehicle.grade,
+                isListView: true,
+              );
+            },
+          );
+        }
 
         return GridView.builder(
           shrinkWrap: true,
@@ -44,6 +69,7 @@ class VehicleListingSection extends StatelessWidget {
                   '${vehicle.year} • ${vehicle.odometer} Km • ${vehicle.transmission}',
               price: formatRupiah(vehicle.price),
               grade: vehicle.grade,
+              isListView: isListView,
             );
           },
         );

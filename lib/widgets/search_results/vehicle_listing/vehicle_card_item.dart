@@ -6,6 +6,7 @@ class VehicleCardItem extends StatelessWidget {
   final String specs;
   final String price;
   final String grade;
+  final bool isListView;
 
   const VehicleCardItem({
     super.key,
@@ -14,6 +15,7 @@ class VehicleCardItem extends StatelessWidget {
     required this.specs,
     required this.price,
     required this.grade,
+    this.isListView = false,
   });
 
   static const Color goldColor = Color(0xFFC9A45C);
@@ -22,6 +24,81 @@ class VehicleCardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isListView) {
+      return Container(
+        height: 150,
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white12),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 180,
+              height: double.infinity,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.directions_car,
+                    color: textMuted,
+                    size: 50,
+                  );
+                },
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      specs,
+                      style: const TextStyle(
+                        color: textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        color: goldColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Grade: $grade',
+                      style: const TextStyle(
+                        color: textMuted,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: cardColor,

@@ -16,6 +16,8 @@ class SearchResultsToolbar extends StatefulWidget {
     required this.onResetFilters,
     required this.selectedSort,
     required this.onSortSelected,
+    required this.isListView,
+    required this.onViewModeChanged,
   });
 
   final String selectedPrice;
@@ -31,6 +33,8 @@ class SearchResultsToolbar extends StatefulWidget {
   final VoidCallback onResetFilters;
   final String selectedSort;
   final ValueChanged<String> onSortSelected;
+  final bool isListView;
+  final ValueChanged<bool> onViewModeChanged;
   
   @override
   State<SearchResultsToolbar> createState() => _SearchResultsToolbarState();
@@ -116,10 +120,13 @@ class _SearchResultsToolbarState extends State<SearchResultsToolbar> {
               ),
               _ViewModeButton(
                 icon: Icons.grid_view,
-                selected: true,
+                selected: !widget.isListView,
+                onTap: () => widget.onViewModeChanged(false),
               ),
               _ViewModeButton(
                 icon: Icons.view_list,
+                selected: widget.isListView,
+                onTap: () => widget.onViewModeChanged(true),
               ),
             ],
           ),
@@ -562,27 +569,33 @@ class _SortDropdown extends StatelessWidget {
 class _ViewModeButton extends StatelessWidget {
   const _ViewModeButton({
     required this.icon,
+    required this.onTap,
     this.selected = false,
   });
 
   final IconData icon;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: selected
-            ? const Color(0xFF303640)
-            : const Color(0xFF191D24),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Icon(
-        icon,
-        color: selected ? const Color(0xFFC9A45C) : Colors.white,
-        size: 16,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: selected
+              ? const Color(0xFF303640)
+              : const Color(0xFF191D24),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Icon(
+          icon,
+          color: selected ? const Color(0xFFC9A45C) : Colors.white,
+          size: 16,
+        ),
       ),
     );
   }

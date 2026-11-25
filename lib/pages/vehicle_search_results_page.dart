@@ -29,6 +29,8 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   String selectedOdometer = 'Semua';
   String selectedLocation = 'Semua Area';
 
+  bool isListView = false;
+
   int currentPage = 1;
   static const int itemsPerPage = 10;
 
@@ -95,6 +97,12 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   void selectPage(int page) {
     setState(() {
       currentPage = page;
+    });
+  }
+
+  void selectViewMode(bool value) {
+    setState(() {
+      isListView = value;
     });
   }
 
@@ -222,9 +230,14 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
                     onResetFilters: resetFilters,
                     selectedSort: selectedSort,
                     onSortSelected: selectSort,
+                    isListView: isListView,
+                    onViewModeChanged: selectViewMode,
                   ),
                   SizedBox(height: 24),
-                  VehicleListingSection(vehicles: paginatedVehicles),
+                  VehicleListingSection(
+                    vehicles: paginatedVehicles,
+                    isListView: isListView,
+                  ),
                   SizedBox(height: 20),
                   VehicleListingFooter(
                     currentPage: currentPage,
