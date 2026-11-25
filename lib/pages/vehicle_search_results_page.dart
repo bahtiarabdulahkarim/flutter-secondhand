@@ -24,6 +24,7 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   String selectedModel = 'Semua Honda';
   String selectedPrice = 'Rp30 Jt - Rp600 Jt';
   String selectedYear = '2019 - 2024';
+  String selectedSort = 'Rekomendasi';
   String selectedTransmission = 'Semua';
   String selectedOdometer = 'Semua';
   String selectedLocation = 'Semua Area';
@@ -72,6 +73,13 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
       selectedTransmission = 'Semua';
       selectedOdometer = 'Semua';
       selectedLocation = 'Semua Area';
+      selectedSort = 'Rekomendasi';
+    });
+  }
+
+  void selectSort(String sort) {
+    setState(() {
+      selectedSort = sort;
     });
   }
 
@@ -144,6 +152,7 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
       transmission: selectedTransmission == 'Semua'
         ? null
         : selectedTransmission,
+      sortBy: selectedSort,
     );
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -183,6 +192,8 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
                     selectedLocation: selectedLocation,
                     onLocationSelected: selectLocation,
                     onResetFilters: resetFilters,
+                    selectedSort: selectedSort,
+                    onSortSelected: selectSort,
                   ),
                   SizedBox(height: 24),
                   VehicleListingSection(vehicles: filteredVehicles),

@@ -75,8 +75,9 @@ class VehicleData {
     int? minOdometer,
     int? maxOdometer,
     String? location,
+    String sortBy = 'Rekomendasi',
   }) {
-    return vehicles.where((vehicle) {
+    final filteredVehicles = vehicles.where((vehicle) {
       final matchesBrand =
           brand == null || vehicle.brand == brand;
 
@@ -121,5 +122,28 @@ class VehicleData {
         matchesMinOdometer &&
         matchesMaxOdometer;
     }).toList();
+    switch (sortBy) {
+      case 'Harga Termurah':
+        filteredVehicles.sort((a, b) => a.price.compareTo(b.price));
+        break;
+
+      case 'Harga Termahal':
+        filteredVehicles.sort((a, b) => b.price.compareTo(a.price));
+        break;
+
+      case 'Tahun Terbaru':
+        filteredVehicles.sort((a, b) => b.year.compareTo(a.year));
+        break;
+
+      case 'Odometer Terendah':
+        filteredVehicles.sort((a, b) => a.odometer.compareTo(b.odometer));
+        break;
+
+      case 'Rekomendasi':
+      default:
+        break;
+    }
+
+    return filteredVehicles;
   }
 }

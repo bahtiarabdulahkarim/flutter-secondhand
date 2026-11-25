@@ -14,6 +14,8 @@ class SearchResultsToolbar extends StatefulWidget {
     required this.selectedLocation,
     required this.onLocationSelected,
     required this.onResetFilters,
+    required this.selectedSort,
+    required this.onSortSelected,
   });
 
   final String selectedPrice;
@@ -27,6 +29,8 @@ class SearchResultsToolbar extends StatefulWidget {
   final String selectedLocation;
   final ValueChanged<String> onLocationSelected;
   final VoidCallback onResetFilters;
+  final String selectedSort;
+  final ValueChanged<String> onSortSelected;
   
   @override
   State<SearchResultsToolbar> createState() => _SearchResultsToolbarState();
@@ -106,7 +110,10 @@ class _SearchResultsToolbarState extends State<SearchResultsToolbar> {
                   fontSize: 10,
                 ),
               ),
-              _SortDropdown(),
+              _SortDropdown(
+                selectedSort: widget.selectedSort,
+                onSelected: widget.onSortSelected,
+              ),
               _ViewModeButton(
                 icon: Icons.grid_view,
                 selected: true,
@@ -469,36 +476,84 @@ class _LocationFilterDropdown extends StatelessWidget {
 }
 
 class _SortDropdown extends StatelessWidget {
-  const _SortDropdown();
+  const _SortDropdown({
+    required this.selectedSort,
+    required this.onSelected,
+  });
+
+  final String selectedSort;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 10,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF242932),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Rekomendasi Inspeksi Terbaik',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
+    return PopupMenuButton<String>(
+      onSelected: onSelected,
+      color: const Color(0xFF242932),
+      offset: const Offset(0, 40),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'Rekomendasi',
+          child: Text(
+            'Rekomendasi',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Harga Termurah',
+          child: Text(
+            'Harga Termurah',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Harga Termahal',
+          child: Text(
+            'Harga Termahal',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Tahun Terbaru',
+          child: Text(
+            'Tahun Terbaru',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'Odometer Terendah',
+          child: Text(
+            'Odometer Terendah',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF242932),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              selectedSort,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
             ),
-          ),
-          SizedBox(width: 7),
-          Icon(
-            Icons.sort,
-            color: Color(0xFFC9A45C),
-            size: 15,
-          ),
-        ],
+            const SizedBox(width: 7),
+            const Icon(
+              Icons.sort,
+              color: Color(0xFFC9A45C),
+              size: 15,
+            ),
+          ],
+        ),
       ),
     );
   }
