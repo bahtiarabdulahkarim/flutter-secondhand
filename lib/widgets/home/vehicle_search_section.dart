@@ -2,7 +2,12 @@
 import 'package:flutter/material.dart';
 
 class VehicleSearchSection extends StatefulWidget {
-  const VehicleSearchSection({super.key});
+  const VehicleSearchSection({
+    super.key,
+    required this.onSearch,
+  });
+
+  final ValueChanged<String> onSearch;
 
   @override
   State<VehicleSearchSection> createState() =>
@@ -39,6 +44,11 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  void _submitSearch() {
+    final keyword = searchController.text.trim();
+    widget.onSearch(keyword);
   }
 
   @override
@@ -541,6 +551,11 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
             onChanged: (value) {
               setState(() {});
             },
+
+            // Membuka halaman hasil saat pengguna menekan Enter
+            onSubmitted: (value) {
+              _submitSearch();
+            },
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
@@ -558,15 +573,31 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
                 color: gold,
                 size: 17,
               ),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  searchController.clear();
-                },
-                icon: const Icon(
-                  Icons.cancel,
-                  color: muted,
-                  size: 16,
-                ),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'Cari kendaraan',
+                    onPressed: _submitSearch,
+                    icon: const Icon(
+                      Icons.arrow_forward,
+                      color: gold,
+                      size: 16,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Hapus pencarian',
+                    onPressed: () {
+                      searchController.clear();
+                      setState(() {});
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: muted,
+                      size: 16,
+                    ),
+                  ),
+                ],
               ),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 8,

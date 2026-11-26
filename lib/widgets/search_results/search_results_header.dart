@@ -21,126 +21,137 @@ class SearchResultsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Breadcrumb
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 6,
-          children: [
-            const Icon(
-              Icons.home_outlined,
-              color: textMuted,
-              size: 13,
-            ),
-            const Text(
-              'Beranda',
-              style: TextStyle(color: textMuted, fontSize: 11),
-            ),
-            const Text('/', style: TextStyle(color: textMuted)),
-            const Text(
-              'Pencarian Kendaraan',
-              style: TextStyle(color: textMuted, fontSize: 11),
-            ),
-            const Text('/', style: TextStyle(color: textMuted)),
-            Text(
-              'Merek: $keyword',
-              style: const TextStyle(
-                color: goldColor,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 700;
 
-        const SizedBox(height: 18),
-
-        // Judul dan informasi layanan
-        Wrap(
-          spacing: 24,
-          runSpacing: 20,
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Informasi hasil pencarian
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Breadcrumb
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: panelColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    '● KURASI ATELIER OTOMOTIF JEPANG',
-                    style: TextStyle(
-                      color: goldColor,
-                      fontSize: 9,
-                      letterSpacing: 1,
-                    ),
-                  ),
+                const Icon(
+                  Icons.home_outlined,
+                  color: textMuted,
+                  size: 13,
                 ),
-
-                const SizedBox(height: 8),
-
-                Text.rich(
-                  TextSpan(
-                    style: const TextStyle(
-                      fontSize: 27,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    children: [
-                      const TextSpan(
-                        text: 'Hasil Pencarian: ',
-                        style: TextStyle(color: textWhite),
-                      ),
-                      TextSpan(
-                        text: keyword,
-                        style: const TextStyle(color: goldColor),
-                      ),
-                    ],
-                  ),
+                const Text(
+                  'Beranda',
+                  style: TextStyle(color: textMuted, fontSize: 11),
                 ),
-
-                const SizedBox(height: 7),
-
+                const Text('/', style: TextStyle(color: textMuted)),
+                const Text(
+                  'Pencarian Kendaraan',
+                  style: TextStyle(color: textMuted, fontSize: 11),
+                ),
+                const Text('/', style: TextStyle(color: textMuted)),
                 Text(
-                  'Ditemukan $totalVehicles Unit Terverifikasi '
-                  '($totalCars Mobil, $totalMotors Motor) — '
-                  'Siap Test Drive Langsung di Rumah & Pengiriman Khusus.',
+                  keyword == 'Semua Merek'
+                      ? 'Semua Merek'
+                      : 'Merek: $keyword',
                   style: const TextStyle(
-                    color: textMuted,
+                    color: goldColor,
                     fontSize: 11,
                   ),
                 ),
               ],
             ),
 
-            // Informasi layanan
+            const SizedBox(height: 18),
+
+            // Judul dan informasi layanan
             Wrap(
-              spacing: 12,
-              runSpacing: 10,
+              spacing: 24,
+              runSpacing: 20,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _ServiceBadge(
-                  icon: Icons.verified,
-                  title: 'GARANSI RESMI',
-                  subtitle: '175-Point Check',
+                // Informasi hasil pencarian
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: panelColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        '● KURASI ATELIER OTOMOTIF JEPANG',
+                        style: TextStyle(
+                          color: goldColor,
+                          fontSize: 9,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: isMobile ? 22 : 27,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: keyword == 'Semua Merek'
+                                ? 'Semua Kendaraan: '
+                                : 'Hasil Pencarian: ',
+                            style: const TextStyle(color: textWhite),
+                          ),
+                          TextSpan(
+                            text: keyword,
+                            style: const TextStyle(color: goldColor),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 7),
+
+                    Text(
+                      'Ditemukan $totalVehicles Unit Terverifikasi '
+                      '($totalCars Mobil, $totalMotors Motor) — '
+                      'Siap Test Drive Langsung di Rumah & Pengiriman Khusus.',
+                      style: TextStyle(
+                        color: textMuted,
+                        fontSize: isMobile ? 10 : 11,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
-                _ServiceBadge(
-                  icon: Icons.support_agent,
-                  title: 'LAYANAN',
-                  subtitle: 'Doorstep Trial',
+
+                // Informasi layanan
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  children: [
+                    _ServiceBadge(
+                      icon: Icons.verified,
+                      title: 'GARANSI RESMI',
+                      subtitle: '175-Point Check',
+                    ),
+                    _ServiceBadge(
+                      icon: Icons.support_agent,
+                      title: 'LAYANAN',
+                      subtitle: 'Doorstep Trial',
+                    ),
+                  ],
                 ),
               ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

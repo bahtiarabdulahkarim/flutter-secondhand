@@ -11,7 +11,12 @@ import '../widgets/home/home_navbar.dart';
 import '../data/vehicle_data.dart';
 
 class VehicleSearchResultsPage extends StatefulWidget {
-  const VehicleSearchResultsPage({super.key});
+  const VehicleSearchResultsPage({
+    super.key,
+    this.initialKeyword = '',
+  });
+
+  final String initialKeyword;
 
   @override
   State<VehicleSearchResultsPage> createState() =>
@@ -20,8 +25,16 @@ class VehicleSearchResultsPage extends StatefulWidget {
 
 class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
   static const Color backgroundColor = Color(0xFF0D1015);
+  String searchKeyword = '';
 
-  String selectedModel = 'Semua Honda';
+  @override
+  void initState() {
+    super.initState();
+    searchKeyword = widget.initialKeyword.trim();
+  }
+
+  String selectedBrand = 'Semua Merek';
+  String selectedModel = 'Semua Model';
   String selectedPrice = 'Rp30 Jt - Rp600 Jt';
   String selectedYear = '2019 - 2024';
   String selectedSort = 'Rekomendasi';
@@ -78,7 +91,8 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
 
   void resetFilters() {
     setState(() {
-      selectedModel = 'Semua Honda';
+      selectedBrand = 'Semua Merek';
+      selectedModel = 'Semua Model';
       selectedPrice = 'Rp30 Jt - Rp600 Jt';
       selectedYear = '2019 - 2024';
       selectedTransmission = 'Semua';
@@ -106,6 +120,14 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
     });
   }
 
+  void selectBrand(String brand) {
+    setState(() {
+      selectedBrand = brand;
+      selectedModel = 'Semua Model';
+      currentPage = 1;
+    });
+  }
+
   Map<String, int?> getPriceRange() {
     switch (selectedPrice) {
       case 'Rp30 Jt - Rp100 Jt':
@@ -118,7 +140,7 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
         return {'min': 300000000, 'max': 600000000};
 
       default:
-        return {'min': 30000000, 'max': 600000000};
+        return {'min': 30000000, 'max': null};
     }
   }
 
@@ -161,11 +183,14 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
     final odometerRange = getOdometerRange();
 
     final filteredVehicles = VehicleData.filterVehicles(
-      brand: 'Honda',
+      keyword: searchKeyword,
+      brand: selectedBrand == 'Semua Merek'
+        ? null
+        : selectedBrand,
       location: selectedLocation == 'Semua Area'
         ? null
         : selectedLocation,
-      model: selectedModel == 'Semua Honda' ? null : selectedModel,
+      model: selectedModel == 'Semua Model' ? null : selectedModel,
       minPrice: priceRange['min'],
       maxPrice: priceRange['max'],
       minYear: yearRange['min'],
@@ -205,15 +230,38 @@ class _VehicleSearchResultsPageState extends State<VehicleSearchResultsPage> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width < 700 ? 16 : 32,
+                vertical: MediaQuery.of(context).size.width < 700 ? 20 : 32,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SearchResultsHeader(),
+                  SearchResultsHeader(
+                  keyword: searchKeyword.isNotEmpty
+                      ? searchKeyword
+                      : selectedBrand == 'Semua Merek'
+                          ? 'Semua Merek'
+                          : selectedBrand,
+                    totalVehicles: filteredVehicles.length,
+                    totalCars: filteredVehicles
+                        .where((vehicle) => vehicle.category == 'Mobil')
+                        .length,
+                    totalMotors: filteredVehicles
+                        .where((vehicle) => vehicle.category == 'Motor')
+                        .length,
+                  ),
                   SizedBox(height: 20),
                   SearchResultsFilterSection(
+                    selectedBrand: selectedBrand,
+                    onBrandSelected: selectBrand,
                     selectedModel: selectedModel,
                     onModelSelected: selectModel,
+                    selectedPrice: selectedPrice,
+                    selectedYear: selectedYear,
+                    selectedTransmission: selectedTransmission,
+                    selectedOdometer: selectedOdometer,
+                    selectedLocation: selectedLocation,
                   ),
                   SizedBox(height: 20),
                   SearchResultsToolbar(

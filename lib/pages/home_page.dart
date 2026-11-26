@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'vehicle_search_results_page.dart';
 
 import '../widgets/home/home_navbar.dart';
 import '../widgets/home/home_hero_section.dart';
@@ -63,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                   constraints: const BoxConstraints(maxWidth: 1200),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: const [
+                    children: [
                       // Hero Section
                       HomeHeroSection(),
                       SizedBox(height: 55),
@@ -73,7 +74,18 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(height: 35),
 
                       // Panel Pencarian dan Katalog
-                      VehicleSearchSection(),
+                      VehicleSearchSection(
+                        onSearch: (keyword) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VehicleSearchResultsPage(
+                                initialKeyword: keyword,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       SizedBox(height: 45),
 
                       // Kategori Kendaraan

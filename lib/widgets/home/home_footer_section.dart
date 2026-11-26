@@ -17,8 +17,8 @@ class HomeFooterSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: const Color(0xFF10141B),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 48,
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width < 700 ? 20 : 48,
         vertical: 32,
       ),
       child: Column(
@@ -199,169 +199,172 @@ class HomeFooterSection extends StatelessWidget {
           ),
           const SizedBox(height: 55),
 
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // KOLOM 1: IDENTITAS SECONDHAND
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'SECONDHAND',
-                      style: TextStyle(
-                        color: gold,
-                        fontSize: 21,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2,
-                      ),
-                    ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 700;
 
-                    const SizedBox(height: 5),
+              final identityWidth = isMobile
+                  ? constraints.maxWidth
+                  : (constraints.maxWidth - 95) * 2 / 5;
 
-                    const Text(
-                      'DRIVE BETTER. BUY SMARTER.',
-                      style: TextStyle(
-                        color: muted,
-                        fontSize: 9,
-                        letterSpacing: 1,
-                      ),
-                    ),
+              final columnWidth = isMobile
+                  ? (constraints.maxWidth - 20) / 2
+                  : (constraints.maxWidth - 95) / 5;
 
-                    const SizedBox(height: 18),
-
-                    const Text(
-                      'Platform marketplace terpercaya di Indonesia untuk jual-beli mobil dan motor bekas berkualitas tinggi dengan inspeksi menyeluruh dan transparansi penuh.',
-                      style: TextStyle(
-                        color: muted,
-                        fontSize: 12,
-                        height: 1.7,
-                      ),
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    const Row(
+              return Wrap(
+                spacing: 20,
+                runSpacing: 30,
+                children: [
+                  // KOLOM 1: IDENTITAS SECONDHAND
+                  SizedBox(
+                    width: identityWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.verified_outlined,
-                          color: gold,
-                          size: 15,
-                        ),
-                        SizedBox(width: 7),
-                        Text(
-                          'VERIFIED 175-PT CHECK GUARANTEE',
+                        const Text(
+                          'SECONDHAND',
                           style: TextStyle(
                             color: gold,
-                            fontSize: 10,
+                            fontSize: 21,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 0.7,
+                            letterSpacing: 2,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 45),
-
-              // KOLOM 2: MOBIL BEKAS
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _footerTitle('MOBIL BEKAS'),
-                    const SizedBox(height: 12),
-                    _footerLink('Sedan'),
-                    _footerLink('SUV'),
-                    _footerLink('MPV'),
-                    _footerLink('Hatchback'),
-                    _footerLink('Mobil Listrik & Hybrid'),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 25),
-
-              // KOLOM 3: MOTOR BEKAS
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _footerTitle('MOTOR BEKAS'),
-                    const SizedBox(height: 12),
-                    _footerLink('Matic Premium'),
-                    _footerLink('Big Bike & Moge'),
-                    _footerLink('Sport Naked'),
-                    _footerLink('Trail & Dual Sport'),
-                    _footerLink('Motor Klasik'),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 25),
-
-              // KOLOM 4: LAYANAN & KONTAK
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _footerTitle('LAYANAN & KONTAK'),
-                    const SizedBox(height: 12),
-                    _footerLink('Jaminan Inspeksi 175 Titik'),
-                    _footerLink('Simulasi Kredit'),
-                    _footerLink('Cara Pembelian'),
-                    _footerLink('Hubungi Kami'),
-
-                    const SizedBox(height: 20),
-
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.chat_outlined,
-                          color: muted,
-                          size: 13,
+                        const SizedBox(height: 5),
+                        const Text(
+                          'DRIVE BETTER. BUY SMARTER.',
+                          style: TextStyle(
+                            color: muted,
+                            fontSize: 9,
+                            letterSpacing: 1,
+                          ),
                         ),
-                        SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            'WhatsApp Concierge (24/7)',
-                            style: TextStyle(
-                              color: Color(0xFFE2E5EC),
-                              fontSize: 10,
+                        const SizedBox(height: 18),
+                        const Text(
+                          'Platform marketplace terpercaya di Indonesia untuk jual-beli mobil dan motor bekas berkualitas tinggi dengan inspeksi menyeluruh dan transparansi penuh.',
+                          style: TextStyle(
+                            color: muted,
+                            fontSize: 12,
+                            height: 1.7,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        const Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 7,
+                          children: [
+                            Icon(
+                              Icons.verified_outlined,
+                              color: gold,
+                              size: 15,
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 7),
-
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.mail_outline,
-                          color: muted,
-                          size: 13,
-                        ),
-                        SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            'support@secondhand.id',
-                            style: TextStyle(
-                              color: Color(0xFFE2E5EC),
-                              fontSize: 10,
+                            Text(
+                              'VERIFIED 175-PT CHECK GUARANTEE',
+                              style: TextStyle(
+                                color: gold,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.7,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+
+                  // KOLOM 2: MOBIL BEKAS
+                  SizedBox(
+                    width: columnWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _footerTitle('MOBIL BEKAS'),
+                        const SizedBox(height: 12),
+                        _footerLink('Sedan'),
+                        _footerLink('SUV'),
+                        _footerLink('MPV'),
+                        _footerLink('Hatchback'),
+                        _footerLink('Mobil Listrik & Hybrid'),
+                      ],
+                    ),
+                  ),
+
+                  // KOLOM 3: MOTOR BEKAS
+                  SizedBox(
+                    width: columnWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _footerTitle('MOTOR BEKAS'),
+                        const SizedBox(height: 12),
+                        _footerLink('Matic Premium'),
+                        _footerLink('Big Bike & Moge'),
+                        _footerLink('Sport Naked'),
+                        _footerLink('Trail & Dual Sport'),
+                        _footerLink('Motor Klasik'),
+                      ],
+                    ),
+                  ),
+
+                  // KOLOM 4: LAYANAN & KONTAK
+                  SizedBox(
+                    width: columnWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _footerTitle('LAYANAN & KONTAK'),
+                        const SizedBox(height: 12),
+                        _footerLink('Jaminan Inspeksi 175 Titik'),
+                        _footerLink('Simulasi Kredit'),
+                        _footerLink('Cara Pembelian'),
+                        _footerLink('Hubungi Kami'),
+                        const SizedBox(height: 20),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.chat_outlined,
+                              color: muted,
+                              size: 13,
+                            ),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'WhatsApp Concierge (24/7)',
+                                style: TextStyle(
+                                  color: Color(0xFFE2E5EC),
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 7),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.mail_outline,
+                              color: muted,
+                              size: 13,
+                            ),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'support@secondhand.id',
+                                style: TextStyle(
+                                  color: Color(0xFFE2E5EC),
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

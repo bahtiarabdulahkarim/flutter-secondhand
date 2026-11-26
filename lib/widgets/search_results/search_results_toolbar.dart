@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../data/vehicle_data.dart';
 
 class SearchResultsToolbar extends StatefulWidget {
   const SearchResultsToolbar({
@@ -51,87 +52,95 @@ class _SearchResultsToolbarState extends State<SearchResultsToolbar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 14,
-      ),
-      color: panelColor,
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.spaceBetween,
-        children: [
-          // Filter kendaraan
-          Wrap(
-            spacing: 5,
-            runSpacing: 8,
-            children: [
-              _PriceFilterDropdown(
-                label: 'Harga: ${widget.selectedPrice}',
-                onSelected: widget.onPriceSelected,
-              ),
-              _YearFilterDropdown(
-                label: 'Tahun: ${widget.selectedYear}',
-                onSelected: widget.onYearSelected,
-              ),
-              _TransmissionFilterDropdown(
-                label: 'Transmisi: ${widget.selectedTransmission}',
-                onSelected: widget.onTransmissionSelected,
-              ),
-              _OdometerFilterDropdown(
-                label: 'Odometer: ${widget.selectedOdometer}',
-                onSelected: widget.onOdometerSelected,
-              ),
-              _LocationFilterDropdown(
-                label: 'Lokasi: ${widget.selectedLocation}',
-                onSelected: widget.onLocationSelected,
-              ),
-            ],
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 700;
 
-          // Pengurutan dan pilihan tampilan
-          Wrap(
-            spacing: 8,
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 10 : 6,
+            vertical: isMobile ? 16 : 14,
+          ),
+          color: panelColor,
+          child: Wrap(
+            spacing: isMobile ? 12 : 10,
+            runSpacing: isMobile ? 14 : 10,
             crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: isMobile
+                ? WrapAlignment.start
+                : WrapAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: widget.onResetFilters,
-                child: const Text(
-                  'Reset Filter',
-                  style: TextStyle(
-                    color: Color(0xFFC9A45C),
-                    fontSize: 10,
+              // Filter kendaraan
+              Wrap(
+                spacing: 5,
+                runSpacing: 8,
+                children: [
+                  _PriceFilterDropdown(
+                    label: 'Harga: ${widget.selectedPrice}',
+                    onSelected: widget.onPriceSelected,
                   ),
-                ),
+                  _YearFilterDropdown(
+                    label: 'Tahun: ${widget.selectedYear}',
+                    onSelected: widget.onYearSelected,
+                  ),
+                  _TransmissionFilterDropdown(
+                    label: 'Transmisi: ${widget.selectedTransmission}',
+                    onSelected: widget.onTransmissionSelected,
+                  ),
+                  _OdometerFilterDropdown(
+                    label: 'Odometer: ${widget.selectedOdometer}',
+                    onSelected: widget.onOdometerSelected,
+                  ),
+                  _LocationFilterDropdown(
+                    label: 'Lokasi: ${widget.selectedLocation}',
+                    onSelected: widget.onLocationSelected,
+                  ),
+                ],
               ),
-              Text(
-                'Urutkan:',
-                style: TextStyle(
-                  color: textMuted,
-                  fontSize: 10,
-                ),
-              ),
-              _SortDropdown(
-                selectedSort: widget.selectedSort,
-                onSelected: widget.onSortSelected,
-              ),
-              _ViewModeButton(
-                icon: Icons.grid_view,
-                selected: !widget.isListView,
-                onTap: () => widget.onViewModeChanged(false),
-              ),
-              _ViewModeButton(
-                icon: Icons.view_list,
-                selected: widget.isListView,
-                onTap: () => widget.onViewModeChanged(true),
+
+              // Pengurutan dan pilihan tampilan
+              Wrap(
+                spacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: widget.onResetFilters,
+                    child: const Text(
+                      'Reset Filter',
+                      style: TextStyle(
+                        color: Color(0xFFC9A45C),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Urutkan:',
+                    style: TextStyle(
+                      color: textMuted,
+                      fontSize: 10,
+                    ),
+                  ),
+                  _SortDropdown(
+                    selectedSort: widget.selectedSort,
+                    onSelected: widget.onSortSelected,
+                  ),
+                  _ViewModeButton(
+                    icon: Icons.grid_view,
+                    selected: !widget.isListView,
+                    onTap: () => widget.onViewModeChanged(false),
+                  ),
+                  _ViewModeButton(
+                    icon: Icons.view_list,
+                    selected: widget.isListView,
+                    onTap: () => widget.onViewModeChanged(true),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -428,26 +437,23 @@ class _LocationFilterDropdown extends StatelessWidget {
       onSelected: onSelected,
       color: const Color(0xFF242932),
       offset: const Offset(0, 40),
+      
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        const PopupMenuItem<String>(
           value: 'Semua Area',
-          child: Text('Semua Area',
-              style: TextStyle(color: Colors.white)),
+          child: Text(
+            'Semua Area',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-        const PopupMenuItem(
-          value: 'Jakarta Selatan',
-          child: Text('Jakarta Selatan',
-              style: TextStyle(color: Colors.white)),
-        ),
-        const PopupMenuItem(
-          value: 'Jakarta Utara',
-          child: Text('Jakarta Utara',
-              style: TextStyle(color: Colors.white)),
-        ),
-        const PopupMenuItem(
-          value: 'Bandung',
-          child: Text('Bandung',
-              style: TextStyle(color: Colors.white)),
+        ...VehicleData.availableLocations.map(
+          (location) => PopupMenuItem<String>(
+            value: location,
+            child: Text(
+              location,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       ],
       child: Container(

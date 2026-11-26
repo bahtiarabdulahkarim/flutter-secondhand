@@ -23,6 +23,8 @@ class VehicleListingFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeTotalPages = totalPages < 1 ? 1 : totalPages;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
@@ -48,7 +50,7 @@ class VehicleListingFooter extends StatelessWidget {
                 const SizedBox(height: 16),
                 _PaginationControls(
                   currentPage: currentPage,
-                  totalPages: totalPages,
+                  totalPages: safeTotalPages,
                   onPageSelected: onPageSelected,
                 ),
               ],
@@ -73,7 +75,7 @@ class VehicleListingFooter extends StatelessWidget {
               const SizedBox(width: 20),
               _PaginationControls(
                 currentPage: currentPage,
-                totalPages: totalPages,
+                totalPages: safeTotalPages,
                 onPageSelected: onPageSelected,
               ),
             ],
@@ -200,9 +202,9 @@ class _PaginationControls extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         IconButton(
-          onPressed: currentPage < totalPages
-              ? () => onPageSelected(currentPage + 1)
-              : null,
+          onPressed: currentPage < totalPages && totalPages > 1
+            ? () => onPageSelected(currentPage + 1)
+            : null,
           icon: const Icon(Icons.chevron_right),
           color: VehicleListingFooter.textMuted,
           disabledColor: Colors.white30,

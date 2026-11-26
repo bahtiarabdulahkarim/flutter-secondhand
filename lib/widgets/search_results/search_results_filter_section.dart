@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import '../../data/vehicle_data.dart';
 
 class SearchResultsFilterSection extends StatelessWidget {
   const SearchResultsFilterSection({
     super.key,
+    required this.selectedBrand,
+    required this.onBrandSelected,
     required this.selectedModel,
     required this.onModelSelected,
+    required this.selectedPrice,
+    required this.selectedYear,
+    required this.selectedTransmission,
+    required this.selectedOdometer,
+    required this.selectedLocation,
   });
+
+  final String selectedBrand;
+  final ValueChanged<String> onBrandSelected;
 
   final String selectedModel;
   final ValueChanged<String> onModelSelected;
+  final String selectedPrice;
+  final String selectedYear;
+final String selectedTransmission;
+  final String selectedOdometer;
+  final String selectedLocation;
 
   static const Color textMuted = Color(0xFFA0A0A0);
 
@@ -30,8 +46,37 @@ class SearchResultsFilterSection extends StatelessWidget {
                 fontSize: 10,
               ),
             ),
-            const _ActiveFilterChip(label: 'Merek: Honda'),
-            const _ActiveFilterChip(label: 'Semua Model (4 Unit)'),
+
+            if (selectedBrand != 'Semua Merek')
+              _ActiveFilterChip(
+                label: 'Merek: $selectedBrand',
+              ),
+
+            if (selectedPrice != 'Rp30 Jt - Rp600 Jt')
+              _ActiveFilterChip(
+                label: 'Harga: $selectedPrice',
+              ),
+
+            if (selectedYear != '2019 - 2024')
+              _ActiveFilterChip(
+                label: 'Tahun: $selectedYear',
+              ),
+
+            if (selectedTransmission != 'Semua')
+              _ActiveFilterChip(
+                label: 'Transmisi: $selectedTransmission',
+              ),
+
+            if (selectedOdometer != 'Semua')
+              _ActiveFilterChip(
+                label: 'Odometer: $selectedOdometer',
+              ),
+
+            if (selectedLocation != 'Semua Area')
+              _ActiveFilterChip(
+                label: 'Lokasi: $selectedLocation',
+              ),
+
             const _ActiveFilterChip(
               label: 'Kondisi: Terinspeksi 175-Titik',
             ),
@@ -40,44 +85,35 @@ class SearchResultsFilterSection extends StatelessWidget {
 
         const SizedBox(height: 18),
 
-        // Pilihan model kendaraan
+        // Pilihan merek kendaraan
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
               _ModelChip(
-                label: 'Semua Honda',
-                count: 4,
-                selected: selectedModel == 'Semua Honda',
-                onTap: () => onModelSelected('Semua Honda'),
+                label: 'Semua Merek',
+                count: VehicleData.vehicles.length,
+                selected: selectedBrand == 'Semua Merek',
+                onTap: () => onBrandSelected('Semua Merek'),
               ),
-              _ModelChip(
-                label: 'Honda CR-V',
-                count: 1,
-                selected: selectedModel == 'Honda CR-V',
-                onTap: () => onModelSelected('Honda CR-V'),
-              ),
-              _ModelChip(
-                label: 'Honda HR-V',
-                count: 1,
-                selected: selectedModel == 'Honda HR-V',
-                onTap: () => onModelSelected('Honda HR-V'),
-              ),
-              _ModelChip(
-                label: 'Honda Civic RS & Turbo',
-                count: 1,
-                selected: selectedModel == 'Honda Civic RS & Turbo',
-                onTap: () => onModelSelected('Honda Civic RS & Turbo'),
-              ),
-              _ModelChip(
-                label: 'Honda Brio RS',
-                count: 1,
-                selected: selectedModel == 'Honda Brio RS',
-                onTap: () => onModelSelected('Honda Brio RS'),
-              ),
+              ...VehicleData.availableBrands.map((brand) {
+                final count = VehicleData.vehicles
+                    .where((vehicle) => vehicle.brand == brand)
+                    .length;
+
+                return _ModelChip(
+                  label: brand,
+                  count: count,
+                  selected: selectedBrand == brand,
+                  onTap: () => onBrandSelected(brand),
+                );
+              }),
             ],
           ),
         ),
+
+        const SizedBox(height: 12),
+
       ],
     );
   }
