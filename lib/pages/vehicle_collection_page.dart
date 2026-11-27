@@ -7,6 +7,7 @@ import '../widgets/vehicle_collection/vehicle_collection_hero.dart';
 import '../widgets/vehicle_collection/vehicle_body_category.dart';
 import '../widgets/vehicle_collection/vehicle_collection_filter.dart';
 import '../widgets/vehicle_collection/vehicle_collection_listing.dart';
+import '../widgets/vehicle_collection/vehicle_credit_simulator.dart';
 
 class VehicleCollectionPage extends StatefulWidget {
   const VehicleCollectionPage({super.key});
@@ -165,6 +166,10 @@ class _VehicleCollectionPageState
                       VehicleCollectionListing(
                         vehicles: filteredVehicles,
                       ),
+
+                      const SizedBox(height: 50),
+
+                      const VehicleCreditSimulator(),
                     ],
                   ),
                 ),
