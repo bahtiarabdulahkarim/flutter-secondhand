@@ -23,181 +23,50 @@ class HomeFooterSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          if (showBanner)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(35),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF242932),
-                  Color(0xFF303234),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                // BAGIAN KIRI
-                Expanded(
-                  flex: 7,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Label program
-                      const Row(
+        if (showBanner)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 800;
+
+              return Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(isMobile ? 20 : 35),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF242932),
+                      Color(0xFF303234),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: isMobile
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.payments_outlined,
-                            color: gold,
-                            size: 13,
+                          _bannerInfo(true),
+                          const SizedBox(height: 25),
+                          _bannerActions(),
+                        ],
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 7,
+                            child: _bannerInfo(false),
                           ),
-                          SizedBox(width: 7),
-                          Text(
-                            'PROGRAM INSTANT CASH-OUT RESMI',
-                            style: TextStyle(
-                              color: gold,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
-                            ),
+                          const SizedBox(width: 35),
+                          Expanded(
+                            flex: 3,
+                            child: _bannerActions(),
                           ),
                         ],
                       ),
-
-                      const SizedBox(height: 12),
-
-                      // Judul
-                      const Text(
-                        'Ingin Menjual Mobil atau Motor Anda dengan Harga Adil?',
-                        style: TextStyle(
-                          color: Color(0xFFE2E5EC),
-                          fontSize: 27,
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Deskripsi
-                      const Text(
-                        'Dapatkan taksiran harga instan berdasarkan data pasar terkini dan proses pembayaran aman tuntas dalam 1x24 jam melalui jaringan kurasi inspektur SECONDHAND tanpa ribet.',
-                        style: TextStyle(
-                          color: muted,
-                          fontSize: 13,
-                          height: 1.8,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Keunggulan layanan
-                      const Wrap(
-                        spacing: 18,
-                        runSpacing: 10,
-                        children: [
-                          _BannerBenefit(
-                            text: 'Tanpa Biaya Tersembunyi',
-                          ),
-                          _BannerBenefit(
-                            text: 'Petugas Datang ke Lokasi',
-                          ),
-                          _BannerBenefit(
-                            text: 'Pelunasan Seketika',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 35),
-
-                // BAGIAN KANAN
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    children: [
-                      // Tombol Ajukan Taksiran Gratis
-                      InkWell(
-                        onTap: () {
-                          
-                        },
-                        borderRadius: BorderRadius.circular(5),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 17),
-                          decoration: BoxDecoration(
-                            color: gold,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Ajukan Taksiran Gratis',
-                                style: TextStyle(
-                                  color: Color(0xFF242424),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(width: 7),
-                              Icon(
-                                Icons.open_in_new,
-                                color: Color(0xFF242424),
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      // Tombol Konsultasi WhatsApp
-                      InkWell(
-                        onTap: () {
-                          
-                        },
-                        borderRadius: BorderRadius.circular(5),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 17),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF171C24),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.chat_outlined,
-                                color: gold,
-                                size: 15,
-                              ),
-                              SizedBox(width: 7),
-                              Flexible(
-                                child: Text(
-                                  'Konsultasi WhatsApp Concierge',
-                                  style: TextStyle(
-                                    color: Color(0xFFE2E5EC),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
-          const SizedBox(height: 55),
+          const SizedBox(height: 18),
 
           LayoutBuilder(
             builder: (context, constraints) {
@@ -368,6 +237,142 @@ class HomeFooterSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _bannerInfo(bool isMobile) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 7,
+          runSpacing: 5,
+          children: [
+            Icon(
+              Icons.payments_outlined,
+              color: gold,
+              size: 13,
+            ),
+            Text(
+              'PROGRAM INSTANT CASH-OUT RESMI',
+              style: TextStyle(
+                color: gold,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Ingin Menjual Mobil atau Motor Anda dengan Harga Adil?',
+          style: TextStyle(
+            color: const Color(0xFFE2E5EC),
+            fontSize: isMobile ? 24 : 27,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Dapatkan taksiran harga instan berdasarkan data pasar terkini dan proses pembayaran aman tuntas dalam 1x24 jam melalui jaringan kurasi inspektur SECONDHAND tanpa ribet.',
+          style: TextStyle(
+            color: muted,
+            fontSize: 13,
+            height: 1.8,
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Wrap(
+          spacing: 18,
+          runSpacing: 10,
+          children: [
+            _BannerBenefit(text: 'Tanpa Biaya Tersembunyi'),
+            _BannerBenefit(text: 'Petugas Datang ke Lokasi'),
+            _BannerBenefit(text: 'Pelunasan Seketika'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _bannerActions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(5),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 17,
+            ),
+            decoration: BoxDecoration(
+              color: gold,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: const Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Ajukan Taksiran Gratis',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF242424),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 7),
+                Icon(
+                  Icons.open_in_new,
+                  color: Color(0xFF242424),
+                  size: 14,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(5),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 17,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF171C24),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.chat_outlined,
+                  color: gold,
+                  size: 15,
+                ),
+                SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                    'Konsultasi WhatsApp Concierge',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFE2E5EC),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

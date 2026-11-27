@@ -9,283 +9,154 @@ class WhyChooseUsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFF10141B),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 38,
-        vertical: 65,
-      ),
-      child: Column(
-        children: [
-          // Label kecil
-          const Text(
-            'NILAI UTAMA KAMI',
-            style: TextStyle(
-              color: gold,
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 2,
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final mobile = constraints.maxWidth < 650;
+
+        return Container(
+          width: double.infinity,
+          color: const Color(0xFF10141B),
+          padding: EdgeInsets.symmetric(
+            horizontal: mobile ? 16 : 38,
+            vertical: mobile ? 40 : 65,
           ),
-
-          const SizedBox(height: 8),
-
-          // Judul utama
-          const Text(
-            'Mengapa Memilih SECONDHAND',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0xFFE2E5EC),
-              fontSize: 25,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          const SizedBox(height: 7),
-
-          // Deskripsi
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: const Text(
-              'Standar baru jual beli kendaraan bekas di Indonesia dengan transparansi menyeluruh, kelayakan mekanis tanpa kompromi, dan ketenangan pikiran jangka panjang.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: muted,
-                fontSize: 12,
-                height: 1.6,
+          child: Column(
+            children: [
+              const Text(
+                'NILAI UTAMA KAMI',
+                style: TextStyle(
+                  color: gold,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 2,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 45),
-          
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(25),
-            decoration: BoxDecoration(
-              color: panel,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.06),
+              const SizedBox(height: 8),
+              const Text(
+                'Mengapa Memilih SECONDHAND',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFE2E5EC),
+                  fontSize: 25,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // KARTU 1
-                    Expanded(
-                      child: Container(
-                        height: 300,
-                        padding: const EdgeInsets.all(25),
-                        decoration: BoxDecoration(
-                          color: panel,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.06),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 45,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                color: gold.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.directions_car_outlined,
-                                color: gold,
-                                size: 24,
-                              ),
-                            ),
+              const SizedBox(height: 7),
+              
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 600),
+                child: Text(
+                  'Standar baru jual beli kendaraan bekas di Indonesia dengan transparansi menyeluruh, kelayakan mekanis tanpa kompromi, dan ketenangan pikiran jangka panjang.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: muted,
+                    fontSize: 12,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 35),
 
-                            const SizedBox(height: 22),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(mobile ? 14 : 25),
+                decoration: BoxDecoration(
+                  color: panel,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.06),
+                  ),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, innerConstraints) {
+                    final columns = innerConstraints.maxWidth < 600
+                        ? 1
+                        : innerConstraints.maxWidth < 950
+                            ? 2
+                            : 3;
 
-                            const Text(
-                              'Pilihan Kendaraan Beragam',
-                              style: TextStyle(
-                                color: Color(0xFFE2E5EC),
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                    const spacing = 18.0;
 
-                            const SizedBox(height: 10),
+                    final cardWidth =
+                        (innerConstraints.maxWidth -
+                                spacing * (columns - 1)) /
+                            columns;
 
-                            const Text(
-                              'Dari city car yang lincah hingga SUV premium, temukan kendaraan yang sesuai dengan gaya hidup dan kebutuhan Anda.',
-                              style: TextStyle(
-                                color: muted,
-                                fontSize: 12,
-                                height: 1.7,
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            SizedBox(
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: [
+                        SizedBox(
+                          width: cardWidth,
+                          child: _featureCard(
+                            icon: Icons.directions_car_outlined,
+                            title: 'Pilihan Kendaraan Beragam',
+                            description:
+                                'Dari city car yang lincah hingga SUV premium, temukan kendaraan yang sesuai dengan gaya hidup dan kebutuhan Anda.',
+                            footer: SizedBox(
                               width: double.infinity,
                               height: 45,
                               child: CustomPaint(
                                 painter: VehicleGraphPainter(gold),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-
-                    // KARTU 2
-                    Expanded(
-                      child: Container(
-                        height: 300,
-                        padding: const EdgeInsets.all(25),
-                        decoration: BoxDecoration(
-                          color: panel,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.06),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 45,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                color: gold.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.verified_outlined,
-                                color: gold,
-                                size: 24,
-                              ),
-                            ),
-
-                            const SizedBox(height: 22),
-
-                            const Text(
-                              'Informasi Kendaraan Lengkap',
-                              style: TextStyle(
-                                color: Color(0xFFE2E5EC),
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            const Text(
-                              'Laporan uji kompresi, ketebalan cat, kesehatan aki, kelistrikan, serta keabsahan dokumen hukum BPKB dan STNK tersimpan digital tanpa ada fakta tersembunyi.',
-                              style: TextStyle(
-                                color: muted,
-                                fontSize: 12,
-                                height: 1.7,
-                              ),
-                            ),
-                            const Spacer(),
-
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        SizedBox(
+                          width: cardWidth,
+                          child: _featureCard(
+                            icon: Icons.verified_outlined,
+                            title: 'Informasi Kendaraan Lengkap',
+                            description:
+                                'Laporan uji kompresi, ketebalan cat, kesehatan aki, kelistrikan, serta keabsahan dokumen hukum BPKB dan STNK tersimpan digital tanpa ada fakta tersembunyi.',
+                            footer: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Flexible(
-                                  child: Text(
-                                    'Indeks Transparansi Inspeksi',
-                                    style: TextStyle(
-                                      color: muted,
-                                      fontSize: 11,
+                                const Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        'Indeks Transparansi Inspeksi',
+                                        style: TextStyle(
+                                          color: muted,
+                                          fontSize: 11,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      '175 / 175',
+                                      style: TextStyle(
+                                        color: gold,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '175 / 175 Poin',
-                                  style: TextStyle(
-                                    color: gold,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                                const SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: const LinearProgressIndicator(
+                                    value: 1,
+                                    minHeight: 6,
+                                    backgroundColor: Color(0xFF303640),
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(gold),
                                   ),
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 10),
-
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: const LinearProgressIndicator(
-                                value: 1,
-                                minHeight: 6,
-                                backgroundColor: Color(0xFF303640),
-                                valueColor: AlwaysStoppedAnimation<Color>(gold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 18),
-
-                    // KARTU 3
-                    Expanded(
-                      child: Container(
-                        height: 300,
-                        padding: const EdgeInsets.all(25),
-                        decoration: BoxDecoration(
-                          color: panel,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.06),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 45,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                color: gold.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.speed,
-                                color: gold,
-                                size: 24,
-                              ),
-                            ),
-
-                            const SizedBox(height: 22),
-
-                            const Text(
-                              'Pengalaman Pencarian Mudah',
-                              style: TextStyle(
-                                color: Color(0xFFE2E5EC),
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            const Text(
-                              'Sistem pencarian intuitif dengan komparasi spesifikasi langsung, kalkulator simulasi kredit terintegrasi dari mitra perbankan terpercaya, dan opsi test drive langsung ke rumah.',
-                              style: TextStyle(
-                                color: muted,
-                                fontSize: 12,
-                                height: 1.7,
-                              ),
-                            ),
-                            const Spacer(),
-
-                            const Row(
+                        SizedBox(
+                          width: cardWidth,
+                          child: _featureCard(
+                            icon: Icons.speed,
+                            title: 'Pengalaman Pencarian Mudah',
+                            description:
+                                'Sistem pencarian intuitif dengan komparasi spesifikasi langsung, kalkulator simulasi kredit terintegrasi dari mitra perbankan terpercaya, dan opsi test drive langsung ke rumah.',
+                            footer: const Row(
                               children: [
                                 Icon(
                                   Icons.headset_mic_outlined,
@@ -304,21 +175,79 @@ class WhyChooseUsSection extends StatelessWidget {
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 ),
-              ]
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _featureCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Widget footer,
+  }) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 300),
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1D222B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.06),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              color: gold.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),    
+            child: Icon(
+              icon,
+              color: gold,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 22),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFFE2E5EC),
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            description,
+            style: const TextStyle(
+              color: muted,
+              fontSize: 12,
+              height: 1.7,
+            ),
+          ),
+          const SizedBox(height: 25),
+          footer,
         ],
       ),
     );
   }
 }
-
 
 class VehicleGraphPainter extends CustomPainter {
   final Color color;
@@ -337,7 +266,6 @@ class VehicleGraphPainter extends CustomPainter {
 
     path.moveTo(0, size.height * 0.72);
 
-    // Lengkungan pertama: naik perlahan
     path.cubicTo(
       size.width * 0.18,
       size.height * 0.45,
@@ -347,7 +275,6 @@ class VehicleGraphPainter extends CustomPainter {
       size.height * 0.58,
     );
 
-    // Lengkungan kedua: turun sedikit lalu naik
     path.cubicTo(
       size.width * 0.62,
       size.height * 0.78,
@@ -363,7 +290,6 @@ class VehicleGraphPainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.fill;
 
-    // Dua titik bulat
     canvas.drawCircle(
       Offset(size.width * 0.43, size.height * 0.58),
       3,

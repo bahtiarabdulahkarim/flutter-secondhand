@@ -9,6 +9,7 @@ import '../widgets/home/vehicle_category_section.dart';
 import '../widgets/home/featured_vehicle_grid_section.dart';
 import '../widgets/home/why_choose_us_section.dart';
 import '../widgets/home/home_footer_section.dart';
+import 'vehicle_collection_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,9 +47,18 @@ class _HomePageState extends State<HomePage> {
           HomeNavbar(
             activeMenu: activeNavMenu,
             onNavigate: (menu) {
-              setState(() {
-                activeNavMenu = menu;
-              });
+              if (menu == 'Mobil') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VehicleCollectionPage(),
+                  ),
+                );
+              } else if (menu == 'Beranda') {
+                setState(() {
+                  activeNavMenu = 'Beranda';
+                });
+              }
             },
             onProfile: () {
               // Navigasi profil akan kita hubungkan nanti.

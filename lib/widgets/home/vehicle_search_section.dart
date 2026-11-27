@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import '../../data/vehicle_data.dart';
 
 class VehicleSearchSection extends StatefulWidget {
   const VehicleSearchSection({
@@ -53,6 +53,106 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
 
   @override
   Widget build(BuildContext context) {
+    // Menentukan kategori kendaraan yang dipilih
+    final selectedCategory = activeTab != 'Semua Kendaraan'
+        ? activeTab
+        : vehicleType;
+
+    // Menentukan rentang harga
+    int? minPrice;
+    int? maxPrice;
+
+    if (isFilterApplied) {
+      switch (appliedBudget) {
+        case 'Rp 100 - 300 Juta':
+          minPrice = 100000000;
+          maxPrice = 300000000;
+          break;
+        case 'Rp 300 - 700 Juta':
+          minPrice = 300000000;
+          maxPrice = 700000000;
+          break;
+        case 'Rp 700 Juta - 1 Miliar':
+          minPrice = 700000000;
+          maxPrice = 1000000000;
+          break;
+        case 'Di atas 1 Miliar':
+          minPrice = 1000000000;
+          break;
+      }
+    }
+
+    // Menentukan rentang tahun
+    int? minYear;
+    int? maxYear;
+
+    if (isFilterApplied) {
+      switch (appliedYear) {
+        case '2018 - 2020':
+          minYear = 2018;
+          maxYear = 2020;
+          break;
+        case '2020 - 2024':
+          minYear = 2020;
+          maxYear = 2024;
+          break;
+        case '2024 - 2026':
+          minYear = 2024;
+          maxYear = 2026;
+          break;
+      }
+    }
+
+    // Mengambil data kendaraan asli
+    final realVehicles = VehicleData.filterVehicles(
+      keyword: searchController.text,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      minYear: minYear,
+      maxYear: maxYear,
+    );
+
+    // Menyaring berdasarkan jenis kendaraan
+    final categoryFilteredVehicles = realVehicles.where((vehicle) {
+      if (selectedCategory == 'Semua Kendaraan') {
+        return true;
+      }
+
+      if (selectedCategory == 'Mobil Bekas') {
+        return vehicle.category == 'Mobil';
+      }
+
+      if (selectedCategory == 'Motor Bekas') {
+        return vehicle.category == 'Motor';
+      }
+
+      return true;
+    }).toList();
+
+    // Menghitung seluruh hasil yang cocok
+    final resultCount = categoryFilteredVehicles.length;
+
+    // Mengubah data kendaraan menjadi format kartu
+    final filteredVehicles = categoryFilteredVehicles.map((vehicle) {
+      final formattedPrice = vehicle.price.toString().replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+        (match) => '${match[1]}.',
+      );
+
+      return <String, String>{
+        'category': vehicle.category,
+        'title': vehicle.name,
+        'specs':
+            '${vehicle.odometer} Km • ${vehicle.transmission} • ${vehicle.location.trim()}',
+        'price': 'Rp $formattedPrice',
+        'installment': 'Hubungi penjual untuk informasi cicilan',
+        'image': vehicle.imageUrl,
+        'tag': 'GRADE ${vehicle.grade}',
+        'type': vehicle.model,
+        'rating': '—',
+      };
+    }).take(3).toList();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -198,7 +298,7 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
                 ),
               ),
               const SizedBox(width: 8),
-              _smallChip('3 Unit Ditemukan', gold),
+              _smallChip('$resultCount Unit Ditemukan', gold),
             ],
           ),
 
@@ -214,178 +314,10 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
                       : 3;
 
               const spacing = 14.0;
-              final width =
-                  (constraints.maxWidth -
+
+              final width = (constraints.maxWidth -
                       spacing * (columns - 1)) /
                   columns;
-              
-              final vehicles = [
-                {
-                  'category': 'Mobil Bekas',
-                  'title': '2023 Honda CR-V 1.5 Turbo',
-                  'specs': '19.200 Km • CVT Otomatis • Jak-Sel',
-                  'price': 'Rp 175.000.000',
-                  'installment': 'Cicilan Rp 7,9 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=700&q=85',
-                  'tag': '175-PT-LULUS',
-                  'type': 'SUV • Turbo',
-                  'rating': '4.8',
-                },
-                {
-                  'category': 'Motor Bekas',
-                  'title': '2023 Yamaha R1',
-                  'specs': '4.500 Km • 1000 CC • Jak-Sel',
-                  'price': 'Rp 650.000.000',
-                  'installment': 'Cicilan Rp 10,8 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=700&q=85',
-                  'tag': 'GRADE A+',
-                  'type': 'Sport Bike',
-                  'rating': '4.7',
-                },
-                {
-                  'category': 'Mobil Bekas',
-                  'title': '2022 Honda HR-V 1.5 SE CVT',
-                  'specs': '24.500 Km • Bensin • Jak-Bar',
-                  'price': 'Rp 340.000.000',
-                  'installment': 'Cicilan Rp 5,6 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=700&q=85',
-                  'tag': 'GRADE A+',
-                  'type': 'Crossover',
-                  'rating': '4.2',
-                },
-                {
-                  'category': 'Motor Bekas',
-                  'title': '2022 Kawasaki Ninja ZX-10R',
-                  'specs': '6.000 Km • 1000 CC • Jak-Bar',
-                  'price': 'Rp 550.000.000',
-                  'installment': 'Cicilan Rp 9,1 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=700&q=85',
-                  'tag': 'INSPEKSI LULUS',
-                  'type': 'Superbike',
-                  'rating': '4.9',
-                },
-                {
-                  'category': 'Mobil Bekas',
-                  'title': '2021 Honda Civic RS 1.5 Turbo',
-                  'specs': '19.800 Km • Tiptronic • SCBD',
-                  'price': 'Rp 455.000.000',
-                  'installment': 'Cicilan Rp 7,5 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=85',
-                  'tag': 'GARANSI 1 THN',
-                  'type': 'Sedan Sport',
-                  'rating': '4.5',
-                },
-                {
-                  'category': 'Motor Bekas',
-                  'title': '2023 Honda CBR1000RR',
-                  'specs': '3.200 Km • 1000 CC • Jakarta',
-                  'price': 'Rp 480.000.000',
-                  'installment': 'Cicilan Rp 8 jt/bln',
-                  'image':
-                      'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?auto=format&fit=crop&w=700&q=85',
-                  'tag': 'GRADE A',
-                  'type': 'Sport Bike',
-                  'rating': '3.9',
-                },
-              ];
-
-              // Menentukan kategori kendaraan yang dipilih
-              final selectedCategory = activeTab != 'Semua Kendaraan'
-                  ? activeTab
-                  : vehicleType;
-
-              // Menyaring kendaraan berdasarkan kategori
-              final tabFilteredVehicles =
-                  activeTab == 'Semua Kendaraan' && vehicleType == 'Semua Kendaraan'
-                      ? vehicles
-                      : vehicles
-                          .where((vehicle) =>
-                              vehicle['category'] == selectedCategory)
-                          .toList();
-
-              final filteredVehicles = tabFilteredVehicles.where((vehicle) {
-                // Mengambil kata yang diketik pengguna
-                final searchQuery = searchController.text.trim().toLowerCase();
-
-                // Mengambil nama dan spesifikasi kendaraan
-                final title = vehicle['title']!.toLowerCase();
-                final specs = vehicle['specs']!.toLowerCase();
-
-                // Memeriksa kecocokan pencarian
-                if (searchQuery.isNotEmpty &&
-                    !title.contains(searchQuery) &&
-                    !specs.contains(searchQuery)) {
-                  return false;
-                }
-
-                // Filter lainnya hanya berjalan setelah tombol diterapkan
-                if (!isFilterApplied) {
-                  return true;
-                }
-
-                // Mengambil harga kendaraan dan mengubahnya menjadi angka
-                final vehiclePrice = int.tryParse(
-                  vehicle['price']!.replaceAll(RegExp(r'[^0-9]'), ''),
-                ) ?? 0;
-
-                // Memeriksa rentang anggaran
-                if (appliedBudget == 'Rp 100 - 300 Juta' &&
-                    (vehiclePrice < 100000000 || vehiclePrice > 300000000)) {
-                  return false;
-                }
-
-                if (appliedBudget == 'Rp 300 - 700 Juta' &&
-                    (vehiclePrice < 300000000 || vehiclePrice > 700000000)) {
-                  return false;
-                }
-
-                if (appliedBudget == 'Rp 700 Juta - 1 Miliar' &&
-                    (vehiclePrice < 700000000 || vehiclePrice > 1000000000)) {
-                  return false;
-                }
-
-                if (appliedBudget == 'Di atas 1 Miliar' &&
-                    vehiclePrice <= 1000000000) {
-                  return false;
-                }
-
-                final vehicleRating =
-                    double.tryParse(vehicle['rating'] ?? '0') ?? 0;
-
-                if (appliedRating == '4.0 ke Atas' && vehicleRating < 4.0) {
-                  return false;
-                }
-
-                if (appliedRating == '4.5 ke Atas' && vehicleRating < 4.5) {
-                  return false;
-                }
-
-                // Memeriksa tahun produksi kendaraan
-                final vehicleTitle = vehicle['title']!;
-                final vehicleYear = int.tryParse(vehicleTitle.substring(0, 4)) ?? 0;
-
-                if (appliedYear == '2018 - 2020' &&
-                    (vehicleYear < 2018 || vehicleYear > 2020)) {
-                  return false;
-                }
-
-                if (appliedYear == '2020 - 2024' &&
-                    (vehicleYear < 2020 || vehicleYear > 2024)) {
-                  return false;
-                }
-
-                if (appliedYear == '2024 - 2026' &&
-                    (vehicleYear < 2024 || vehicleYear > 2026)) {
-                  return false;
-                }
-
-                return true;
-              }).take(3).toList();
 
               return Wrap(
                 spacing: spacing,
@@ -396,7 +328,7 @@ class _VehicleSearchSectionState extends State<VehicleSearchSection> {
                     child: _resultCard(vehicle),
                   );
                 }).toList(),
-              );// Memeriksa rating kendaraan
+              );
             },
           ),
 
