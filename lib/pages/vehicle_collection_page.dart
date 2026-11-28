@@ -8,6 +8,8 @@ import '../widgets/vehicle_collection/vehicle_body_category.dart';
 import '../widgets/vehicle_collection/vehicle_collection_filter.dart';
 import '../widgets/vehicle_collection/vehicle_collection_listing.dart';
 import '../widgets/vehicle_collection/vehicle_credit_simulator.dart';
+import '../widgets/vehicle_collection/vehicle_purchase_guarantee.dart';
+import '../widgets/home/home_footer_section.dart';
 
 class VehicleCollectionPage extends StatefulWidget {
   const VehicleCollectionPage({super.key});
@@ -70,109 +72,119 @@ class _VehicleCollectionPageState
             },
             onProfile: () {},
           ),
-
+          
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const VehicleCollectionHero(),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1200),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const VehicleCollectionHero(),
 
-                      const SizedBox(height: 45),
+                            const SizedBox(height: 45),
 
-                      VehicleBodyCategory(
-                        onCategorySelected: (category) {
-                          debugPrint(
-                            'Kategori dipilih: $category',
-                          );
-                        },
-                      ),
+                            VehicleBodyCategory(
+                              onCategorySelected: (category) {
+                                debugPrint('Kategori dipilih: $category');
+                              },
+                            ),
 
-                      const SizedBox(height: 35),
+                            const SizedBox(height: 35),
 
-                      VehicleCollectionFilter(
-                        onFilterChanged: handleFilterChanged,
-                      ),
+                            VehicleCollectionFilter(
+                              onFilterChanged: handleFilterChanged,
+                            ),
 
-                      const SizedBox(height: 25),
+                            const SizedBox(height: 25),
 
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isMobile = constraints.maxWidth < 600;
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final isMobile = constraints.maxWidth < 600;
 
-                          final countText = Text.rich(
-                            TextSpan(
-                              children: [
-                                const TextSpan(text: 'Menampilkan '),
-                                TextSpan(
-                                  text: '1-${filteredVehicles.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                final countText = Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      const TextSpan(text: 'Menampilkan '),
+                                      TextSpan(
+                                        text: '1-${filteredVehicles.length}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(text: ' dari '),
+                                      TextSpan(
+                                        text: '${filteredVehicles.length}',
+                                        style: const TextStyle(
+                                          color: gold,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(text: ' Mobil Terkurasi'),
+                                    ],
                                   ),
-                                ),
-                                const TextSpan(text: ' dari '),
-                                TextSpan(
-                                  text: '${filteredVehicles.length}',
                                   style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                  ),
+                                );
+
+                                const testDriveText = Text(
+                                  '◉ Seluruh unit siap dijalankan (Test Drive)',
+                                  style: TextStyle(
                                     color: gold,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
                                   ),
-                                ),
-                                const TextSpan(text: ' Mobil Terkurasi'),
-                              ],
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          );
+                                );
 
-                          const testDriveText = Text(
-                            '◉ Seluruh unit siap dijalankan (Test Drive)',
-                            style: TextStyle(
-                              color: gold,
-                              fontSize: 11,
+                                if (isMobile) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      countText,
+                                      const SizedBox(height: 8),
+                                      testDriveText,
+                                    ],
+                                  );
+                                }
+
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    countText,
+                                    testDriveText,
+                                  ],
+                                );
+                              },
                             ),
-                          );
 
-                          if (isMobile) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                countText,
-                                const SizedBox(height: 8),
-                                testDriveText,
-                              ],
-                            );
-                          }
+                            const SizedBox(height: 18),
 
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              countText,
-                              testDriveText,
-                            ],
-                          );
-                        },
+                            VehicleCollectionListing(
+                              vehicles: filteredVehicles,
+                            ),
+
+                            const SizedBox(height: 50),
+
+                            const VehicleCreditSimulator(),
+
+                            const SizedBox(height: 20),
+
+                            const VehiclePurchaseGuarantee(),
+                          ],
+                        ),
                       ),
-
-                      const SizedBox(height: 18),
-
-                      VehicleCollectionListing(
-                        vehicles: filteredVehicles,
-                      ),
-
-                      const SizedBox(height: 50),
-
-                      const VehicleCreditSimulator(),
-                    ],
+                    ),
                   ),
-                ),
+
+                  const HomeFooterSection(),
+                ],
               ),
             ),
           ),
