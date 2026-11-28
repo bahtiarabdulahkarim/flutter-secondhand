@@ -16,6 +16,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=85',
       grade: 'A+',
       status: 'Tersedia',
+      engineCc: 250,
     ),
     VehicleModel(
       id: 'MTR002',
@@ -31,6 +32,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 160,
     ),
     VehicleModel(
       id: 'MTR003',
@@ -46,6 +48,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=900&q=85',
       grade: 'A+',
       status: 'Tersedia',
+      engineCc: 249,
     ),
     VehicleModel(
       id: 'MTR004',
@@ -61,6 +64,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 155,
     ),
     VehicleModel(
       id: 'MTR005',
@@ -76,6 +80,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=900&q=85',
       grade: 'A+',
       status: 'Tersedia',
+      engineCc: 250,
     ),
     VehicleModel(
       id: 'MTR006',
@@ -91,6 +96,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 650,
     ),
     VehicleModel(
       id: 'MTR007',
@@ -106,6 +112,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 150,
     ),
     VehicleModel(
       id: 'MTR008',
@@ -121,6 +128,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 150,
     ),
     VehicleModel(
       id: 'MTR009',
@@ -136,6 +144,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=85',
       grade: 'A+',
       status: 'Tersedia',
+      engineCc: 313,
     ),
     VehicleModel(
       id: 'MTR010',
@@ -151,6 +160,7 @@ class MotorcycleData {
       imageUrl: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=900&q=85',
       grade: 'A',
       status: 'Tersedia',
+      engineCc: 250,
     ),
   ];
 

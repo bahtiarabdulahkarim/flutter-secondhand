@@ -5,32 +5,34 @@ class MotorcycleFilter extends StatelessWidget {
   const MotorcycleFilter({
     super.key,
     required this.selectedBrand,
+    required this.selectedCapacity,
     required this.selectedPrice,
-    required this.selectedYear,
-    required this.selectedTransmission,
-    required this.selectedLocation,
+    required this.selectedSort,
     required this.searchKeyword,
     required this.onBrandChanged,
+    required this.onCapacityChanged,
     required this.onPriceChanged,
-    required this.onYearChanged,
-    required this.onTransmissionChanged,
-    required this.onLocationChanged,
+    required this.onSortChanged,
     required this.onSearchChanged,
     required this.onReset,
+    required this.resultCount,
+    required this.currentPage,
+    required this.itemsPerPage,
   });
 
   final String selectedBrand;
+  final String selectedCapacity;
   final String selectedPrice;
-  final String selectedYear;
-  final String selectedTransmission;
-  final String selectedLocation;
+  final String selectedSort;
   final String searchKeyword;
+  final int resultCount;
+  final int currentPage;
+  final int itemsPerPage;
 
   final ValueChanged<String> onBrandChanged;
+  final ValueChanged<String> onCapacityChanged;
   final ValueChanged<String> onPriceChanged;
-  final ValueChanged<String> onYearChanged;
-  final ValueChanged<String> onTransmissionChanged;
-  final ValueChanged<String> onLocationChanged;
+  final ValueChanged<String> onSortChanged;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onReset;
 
@@ -38,8 +40,16 @@ class MotorcycleFilter extends StatelessWidget {
   static const Color muted = Color(0xFFA0A5AE);
   static const Color fieldColor = Color(0xFF242932);
 
+  static const List<String> capacityOptions = [
+    'Semua Kapasitas (CC)',
+    'Di bawah 150 CC',
+    '150 - 250 CC',
+    '251 - 500 CC',
+    'Di atas 500 CC',
+  ];
+
   static const List<String> priceOptions = [
-    'Semua Harga',
+    'Semua Rentang Harga',
     'Di bawah Rp30 Juta',
     'Rp30 - 60 Juta',
     'Rp60 - 100 Juta',
@@ -47,153 +57,203 @@ class MotorcycleFilter extends StatelessWidget {
     'Di atas Rp200 Juta',
   ];
 
-  static const List<String> yearOptions = [
-    'Semua Tahun',
-    '2020 - 2021',
-    '2022 - 2023',
-    '2024 - 2025',
-    '2026',
-  ];
-
-  static const List<String> transmissionOptions = [
-    'Semua Transmisi',
-    'CVT Otomatis',
-    'Manual',
+  static const List<String> sortOptions = [
+    'Tahun Terbaru',
+    'Tahun Terlama',
+    'Harga Terendah',
+    'Harga Tertinggi',
   ];
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 650;
+        final isMobile = constraints.maxWidth < 750;
 
         return Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
             color: const Color(0xFF191D24),
             borderRadius: BorderRadius.circular(7),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Colors.white.withValues(alpha: 0.04),
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+            children: [  
+            if (isMobile)
+              Column(
                 children: [
-                  const Icon(Icons.tune, color: gold, size: 19),
-                  const SizedBox(width: 9),
-                  const Expanded(
-                    child: Text(
-                      'Filter Pencarian Motor',
-                      style: TextStyle(
-                        color: Color(0xFFE1E3EB),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                  _searchField(),
+                  const SizedBox(height: 10),
+
+                  // Baris pertama: Merek dan Kapasitas
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDropdown(
+                          value: selectedBrand,
+                          options: [
+                            'Semua Merek',
+                            ...MotorcycleData.availableBrands,
+                          ],
+                          onChanged: onBrandChanged,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildDropdown(
+                          value: selectedCapacity,
+                          options: capacityOptions,
+                          onChanged: onCapacityChanged,
+                        ),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: onReset,
-                    child: const Text(
-                      'Reset Filter',
-                      style: TextStyle(
-                        color: gold,
-                        fontSize: 11,
+                  const SizedBox(height: 9),
+
+                  // Baris kedua: Harga dan Urutan
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDropdown(
+                          value: selectedPrice,
+                          options: priceOptions,
+                          onChanged: onPriceChanged,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildDropdown(
+                          value: selectedSort,
+                          options: sortOptions,
+                          onChanged: onSortChanged,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 9),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _resetButton(),
                   ),
                 ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _searchField(),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildDropdown(
+                      value: selectedBrand,
+                      options: [
+                        'Semua Merek',
+                        ...MotorcycleData.availableBrands,
+                      ],
+                      onChanged: onBrandChanged,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildDropdown(
+                      value: selectedCapacity,
+                      options: capacityOptions,
+                      onChanged: onCapacityChanged,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildDropdown(
+                      value: selectedPrice,
+                      options: priceOptions,
+                      onChanged: onPriceChanged,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildDropdown(
+                      value: selectedSort,
+                      options: sortOptions,
+                      onChanged: onSortChanged,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  _resetButton(),
+                ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
+              Divider(
+                color: Colors.white.withValues(alpha: 0.06),
+                height: 1,
+              ),
+              const SizedBox(height: 10),
 
-              _searchField(),
-              const SizedBox(height: 14),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isSmall = constraints.maxWidth < 650;
 
-              if (isMobile)
-                Column(
-                  children: [
-                    _buildDropdown(
-                      label: 'Merek Motor',
-                      value: selectedBrand,
-                      options: [
-                        'Semua Merek',
-                        ...MotorcycleData.availableBrands,
+                  final startItem = resultCount == 0
+                      ? 0
+                      : ((currentPage - 1) * itemsPerPage) + 1;
+
+                  final endItem = (currentPage * itemsPerPage)
+                      .clamp(0, resultCount);
+
+                  final resultText = Text(
+                    'Menampilkan $startItem-$endItem dari $resultCount '
+                    'Motor Terkurasi Siap Kirim',
+                    style: const TextStyle(
+                      color: Color(0xFFE1E3EB),
+                      fontSize: 11,
+                    ),
+                  );
+
+                  final guaranteeText = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(
+                        Icons.verified_outlined,
+                        color: gold,
+                        size: 14,
+                      ),
+                      SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          'Seluruh unit siap test drive di showroom rekanan resmi',
+                          style: TextStyle(
+                            color: gold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+
+                  if (isSmall) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        resultText,
+                        const SizedBox(height: 8),
+                        guaranteeText,
                       ],
-                      onChanged: onBrandChanged,
-                    ),
-                    _buildDropdown(
-                      label: 'Rentang Harga',
-                      value: selectedPrice,
-                      options: priceOptions,
-                      onChanged: onPriceChanged,
-                    ),
-                    _buildDropdown(
-                      label: 'Tahun Produksi',
-                      value: selectedYear,
-                      options: yearOptions,
-                      onChanged: onYearChanged,
-                    ),
-                    _buildDropdown(
-                      label: 'Transmisi',
-                      value: selectedTransmission,
-                      options: transmissionOptions,
-                      onChanged: onTransmissionChanged,
-                    ),
-                    _buildDropdown(
-                      label: 'Lokasi',
-                      value: selectedLocation,
-                      options: [
-                        'Semua Lokasi',
-                        ...MotorcycleData.availableLocations,
-                      ],
-                      onChanged: onLocationChanged,
-                    ),
-                  ],
-                )
-              else
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    _dropdownBox(
-                      label: 'Merek Motor',
-                      value: selectedBrand,
-                      options: [
-                        'Semua Merek',
-                        ...MotorcycleData.availableBrands,
-                      ],
-                      onChanged: onBrandChanged,
-                    ),
-                    _dropdownBox(
-                      label: 'Rentang Harga',
-                      value: selectedPrice,
-                      options: priceOptions,
-                      onChanged: onPriceChanged,
-                    ),
-                    _dropdownBox(
-                      label: 'Tahun Produksi',
-                      value: selectedYear,
-                      options: yearOptions,
-                      onChanged: onYearChanged,
-                    ),
-                    _dropdownBox(
-                      label: 'Transmisi',
-                      value: selectedTransmission,
-                      options: transmissionOptions,
-                      onChanged: onTransmissionChanged,
-                    ),
-                    _dropdownBox(
-                      label: 'Lokasi',
-                      value: selectedLocation,
-                      options: [
-                        'Semua Lokasi',
-                        ...MotorcycleData.availableLocations,
-                      ],
-                      onChanged: onLocationChanged,
-                    ),
-                  ],
-                ),
+                    );
+                  }
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      resultText,
+                      guaranteeText,
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         );
@@ -202,111 +262,111 @@ class MotorcycleFilter extends StatelessWidget {
   }
 
   Widget _searchField() {
-    return TextField(
+    return TextFormField(
+      initialValue: searchKeyword,
       onChanged: onSearchChanged,
-      controller: TextEditingController(text: searchKeyword)
-        ..selection = TextSelection.collapsed(
-          offset: searchKeyword.length,
-        ),
       style: const TextStyle(
         color: Colors.white,
-        fontSize: 12,
+        fontSize: 11,
       ),
       decoration: InputDecoration(
-        hintText: 'Cari nama atau merek motor...',
-        hintStyle: const TextStyle(color: muted, fontSize: 12),
-        prefixIcon: const Icon(Icons.search, color: gold, size: 19),
+        hintText: 'Cari merek / model motor...',
+        hintStyle: const TextStyle(
+          color: muted,
+          fontSize: 10,
+        ),
+        prefixIcon: const Icon(
+          Icons.search,
+          color: gold,
+          size: 18,
+        ),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 35,
+        ),
         filled: true,
         fillColor: fieldColor,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
+          horizontal: 8,
           vertical: 13,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,
         ),
       ),
     );
   }
 
-  Widget _dropdownBox({
-    required String label,
-    required String value,
-    required List<String> options,
-    required ValueChanged<String> onChanged,
-  }) {
-    return SizedBox(
-      width: 175,
-      child: _buildDropdown(
-        label: label,
-        value: value,
-        options: options,
-        onChanged: onChanged,
-      ),
-    );
-  }
-
   Widget _buildDropdown({
-    required String label,
     required String value,
     required List<String> options,
     required ValueChanged<String> onChanged,
   }) {
     final safeValue = options.contains(value) ? value : options.first;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: muted,
-              fontSize: 10,
-            ),
+    return DropdownButtonFormField<String>(
+      initialValue: safeValue,
+      isExpanded: true,
+      dropdownColor: fieldColor,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+      ),
+      icon: const Icon(
+        Icons.keyboard_arrow_down,
+        color: muted,
+        size: 17,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: fieldColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      items: options.map((option) {
+        return DropdownMenuItem<String>(
+          value: option,
+          child: Text(
+            option,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 7),
-          DropdownButtonFormField<String>(
-            initialValue: safeValue,
-            isExpanded: true,
-            dropdownColor: fieldColor,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-            ),
-            icon: const Icon(
-              Icons.keyboard_arrow_down,
-              color: gold,
-              size: 18,
-            ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: fieldColor,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 12,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            items: options.map((option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Text(
-                  option,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) onChanged(value);
-            },
+        );
+      }).toList(),
+      onChanged: (value) {
+        if (value != null) onChanged(value);
+      },
+    );
+  }
+
+  Widget _resetButton() {
+    return SizedBox(
+      height: 43,
+      child: OutlinedButton.icon(
+        onPressed: onReset,
+        icon: const Icon(
+          Icons.refresh,
+          size: 15,
+        ),
+        label: const Text(
+          'Reset',
+          style: TextStyle(fontSize: 10),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: gold,
+          side: BorderSide(
+            color: gold.withValues(alpha: 0.5),
           ),
-        ],
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
       ),
     );
   }

@@ -31,6 +31,11 @@ class MotorcycleListing extends StatelessWidget {
                 ? 2
                 : 1;
 
+        final cardWidth =
+            (width - (crossAxisCount - 1) * 16) / crossAxisCount;
+
+        final cardHeight = (cardWidth / 1.65) + 300;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -99,7 +104,7 @@ class MotorcycleListing extends StatelessWidget {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  mainAxisExtent: 450,
+                  mainAxisExtent: cardHeight,
                 ),
                 itemBuilder: (context, index) {
                   final motorcycle = motorcycles[index];

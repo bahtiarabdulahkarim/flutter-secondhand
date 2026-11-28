@@ -30,10 +30,9 @@ class _MotorcycleCollectionPageState
   static const int itemsPerPage = 9;
 
   String selectedBrand = 'Semua Merek';
-  String selectedPrice = 'Semua Harga';
-  String selectedYear = 'Semua Tahun';
-  String selectedTransmission = 'Semua Transmisi';
-  String selectedLocation = 'Semua Lokasi';
+  String selectedCapacity = 'Semua Kapasitas (CC)';
+  String selectedPrice = 'Semua Rentang Harga';
+  String selectedSort = 'Tahun Terbaru';
   String searchKeyword = '';
 
   bool isListView = false;
@@ -69,6 +68,24 @@ class _MotorcycleCollectionPageState
           .toList();
     }
 
+    // Filter kapasitas mesin
+    result = result.where((motorcycle) {
+      final cc = motorcycle.engineCc ?? 0;
+
+      switch (selectedCapacity) {
+        case 'Di bawah 150 CC':
+          return cc > 0 && cc < 150;
+        case '150 - 250 CC':
+          return cc >= 150 && cc <= 250;
+        case '251 - 500 CC':
+          return cc >= 251 && cc <= 500;
+        case 'Di atas 500 CC':
+          return cc > 500;
+        default:
+          return true;
+      }
+    }).toList();    
+
     // Filter harga
     result = result.where((motorcycle) {
       final price = motorcycle.price;
@@ -94,43 +111,20 @@ class _MotorcycleCollectionPageState
       }
     }).toList();
 
-    // Filter tahun
-    result = result.where((motorcycle) {
-      switch (selectedYear) {
-        case '2020 - 2021':
-          return motorcycle.year >= 2020 && motorcycle.year <= 2021;
-
-        case '2022 - 2023':
-          return motorcycle.year >= 2022 && motorcycle.year <= 2023;
-
-        case '2024 - 2025':
-          return motorcycle.year >= 2024 && motorcycle.year <= 2025;
-
-        case '2026':
-          return motorcycle.year == 2026;
-
-        default:
-          return true;
-      }
-    }).toList();
-
-    // Filter transmisi
-    if (selectedTransmission != 'Semua Transmisi') {
-      result = result
-          .where((motorcycle) =>
-              motorcycle.transmission == selectedTransmission)
-          .toList();
+    // Urutkan hasil
+    switch (selectedSort) {
+      case 'Tahun Terlama':
+        result.sort((a, b) => a.year.compareTo(b.year));
+        break;
+      case 'Harga Terendah':
+        result.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'Harga Tertinggi':
+        result.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      default:
+        result.sort((a, b) => b.year.compareTo(a.year));
     }
-
-    // Filter lokasi
-    if (selectedLocation != 'Semua Lokasi') {
-      result = result
-          .where((motorcycle) => motorcycle.location == selectedLocation)
-          .toList();
-    }
-
-    // Urutkan tahun terbaru
-    result.sort((a, b) => b.year.compareTo(a.year));
 
     filteredMotorcycles = result;
   }
@@ -172,10 +166,9 @@ class _MotorcycleCollectionPageState
   void _resetFilters() {
     _updateFilters(() {
       selectedBrand = 'Semua Merek';
-      selectedPrice = 'Semua Harga';
-      selectedYear = 'Semua Tahun';
-      selectedTransmission = 'Semua Transmisi';
-      selectedLocation = 'Semua Lokasi';
+      selectedCapacity = 'Semua Kapasitas (CC)';
+      selectedPrice = 'Semua Rentang Harga';
+      selectedSort = 'Tahun Terbaru';
       searchKeyword = '';
     });
   }
@@ -224,49 +217,34 @@ class _MotorcycleCollectionPageState
 
                             MotorcycleFilter(
                               selectedBrand: selectedBrand,
+                              selectedCapacity: selectedCapacity,
                               selectedPrice: selectedPrice,
-                              selectedYear: selectedYear,
-                              selectedTransmission: selectedTransmission,
-                              selectedLocation: selectedLocation,
+                              selectedSort: selectedSort,
                               searchKeyword: searchKeyword,
+
+                              resultCount: filteredMotorcycles.length,
+                              currentPage: currentPage,
+                              itemsPerPage: itemsPerPage,
+
                               onBrandChanged: (value) {
-                                _updateFilters(() {
-                                  selectedBrand = value;
-                                });
+                                _updateFilters(() => selectedBrand = value);
+                              },
+                              onCapacityChanged: (value) {
+                                _updateFilters(() => selectedCapacity = value);
                               },
                               onPriceChanged: (value) {
-                                _updateFilters(() {
-                                  selectedPrice = value;
-                                });
+                                _updateFilters(() => selectedPrice = value);
                               },
-                              onYearChanged: (value) {
-                                _updateFilters(() {
-                                  selectedYear = value;
-                                });
-                              },
-                              onTransmissionChanged: (value) {
-                                _updateFilters(() {
-                                  selectedTransmission = value;
-                                });
-                              },
-                              onLocationChanged: (value) {
-                                _updateFilters(() {
-                                  selectedLocation = value;
-                                });
+                              onSortChanged: (value) {
+                                _updateFilters(() => selectedSort = value);
                               },
                               onSearchChanged: (value) {
-                                _updateFilters(() {
-                                  searchKeyword = value;
-                                });
+                                _updateFilters(() => searchKeyword = value);
                               },
                               onReset: _resetFilters,
                             ),
 
                             const SizedBox(height: 30),
-
-                            _buildResultInfo(),
-
-                            const SizedBox(height: 18),
 
                             MotorcycleListing(
                               motorcycles: paginatedMotorcycles,
@@ -301,50 +279,6 @@ class _MotorcycleCollectionPageState
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildResultInfo() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
-
-        final countText = Text(
-          '${filteredMotorcycles.length} motor ditemukan',
-          style: const TextStyle(
-            color: Color(0xFFE1E3EB),
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-        );
-
-        const infoText = Text(
-          'Pilihan motor bekas berkualitas dan terverifikasi',
-          style: TextStyle(
-            color: muted,
-            fontSize: 11,
-          ),
-        );
-
-        if (isMobile) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              countText,
-              const SizedBox(height: 5),
-              infoText,
-            ],
-          );
-        }
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            countText,
-            infoText,
-          ],
-        );
-      },
     );
   }
 

@@ -12,6 +12,7 @@ class VehicleModel {
   final String imageUrl;
   final String grade;
   final String status;
+  final int? engineCc;
 
   const VehicleModel({
     required this.id,
@@ -27,5 +28,6 @@ class VehicleModel {
     required this.imageUrl,
     required this.grade,
     required this.status,
+    this.engineCc,
   });
 }

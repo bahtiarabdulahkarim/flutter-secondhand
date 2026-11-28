@@ -9,31 +9,31 @@ class MotorcycleCategory extends StatelessWidget {
   static const List<Map<String, dynamic>> categories = [
     {
       'title': 'Maxi & Matic',
-      'description': 'Motor matic premium untuk kenyamanan harian dan perjalanan jauh.',
+      'description': 'Kenyamanan Harian & Touring Lincah',
       'icon': Icons.electric_moped_outlined,
       'count': '01',
     },
     {
       'title': 'Big Bike & Moge',
-      'description': 'Pilihan motor berkapasitas besar dengan performa istimewa.',
+      'description': 'Performa Tinggi di Atas 500cc',
       'icon': Icons.motorcycle,
       'count': '02',
     },
     {
       'title': 'Sport Fairing',
-      'description': 'Motor sport dengan desain aerodinamis dan karakter agresif.',
+      'description': 'Aerodinamis & Adrenalin Sirkuit',
       'icon': Icons.speed,
       'count': '03',
     },
     {
       'title': 'Naked & Neo-Retro',
-      'description': 'Perpaduan gaya klasik dan modern untuk karakter berbeda.',
+      'description': 'Gaya Ikonik & Posisi Tegak',
       'icon': Icons.two_wheeler,
       'count': '04',
     },
     {
       'title': 'Trail & Adventure',
-      'description': 'Motor tangguh untuk berbagai medan perjalanan.',
+      'description': 'Siap Libas Segala Medan & Aspal',
       'icon': Icons.terrain,
       'count': '05',
     },
@@ -45,11 +45,11 @@ class MotorcycleCategory extends StatelessWidget {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
 
-        final crossAxisCount = width >= 1100
+        final crossAxisCount = width >= 1000
             ? 5
-            : width >= 700
+            : width >= 650
                 ? 3
-                : width >= 450
+                : width >= 400
                     ? 2
                     : 1;
 
@@ -57,7 +57,7 @@ class MotorcycleCategory extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'KLASIFIKASI MOTOR',
+              'KLASIFIKASI KENDARAAN',
               style: TextStyle(
                 color: gold,
                 fontSize: 9,
@@ -65,34 +65,25 @@ class MotorcycleCategory extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             const Text(
-              'Jelajahi Kategori Motor',
+              'Pilih Sesuai Karakter Berkendara Anda',
               style: TextStyle(
                 color: Color(0xFFE1E3EB),
-                fontSize: 25,
+                fontSize: 21,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 7),
-            const Text(
-              'Temukan motor pilihan berdasarkan gaya berkendara dan kebutuhan perjalanan Anda.',
-              style: TextStyle(
-                color: muted,
-                fontSize: 11,
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 17),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: categories.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                mainAxisExtent: 170,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 165,
               ),
               itemBuilder: (context, index) {
                 final category = categories[index];
@@ -120,10 +111,10 @@ class MotorcycleCategory extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFF191D24),
+        color: const Color(0xFF1B2028),
         borderRadius: BorderRadius.circular(7),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withValues(alpha: 0.04),
         ),
       ),
       child: Column(
@@ -132,13 +123,35 @@ class MotorcycleCategory extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: gold, size: 25),
-              Text(
-                count,
-                style: const TextStyle(
-                  color: Color(0xFF555D69),
-                  fontSize: 11,
-                  letterSpacing: 1,
+              Container(
+                width: 37,
+                height: 37,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF303640),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  icon,
+                  color: gold,
+                  size: 21,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D1118),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Text(
+                  count,
+                  style: const TextStyle(
+                    color: Color(0xFFE1E3EB),
+                    fontSize: 9,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
             ],
@@ -154,14 +167,14 @@ class MotorcycleCategory extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
             description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: muted,
-              fontSize: 9,
+              fontSize: 10,
               height: 1.5,
             ),
           ),
