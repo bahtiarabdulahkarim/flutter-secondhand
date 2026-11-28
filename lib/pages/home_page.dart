@@ -10,6 +10,7 @@ import '../widgets/home/featured_vehicle_grid_section.dart';
 import '../widgets/home/why_choose_us_section.dart';
 import '../widgets/home/home_footer_section.dart';
 import 'vehicle_collection_page.dart';
+import 'motorcycle_collection_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -52,6 +53,13 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const VehicleCollectionPage(),
+                  ),
+                );
+              } else if (menu == 'Motor') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MotorcycleCollectionPage(),
                   ),
                 );
               } else if (menu == 'Beranda') {
